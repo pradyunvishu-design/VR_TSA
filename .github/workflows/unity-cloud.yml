@@ -1,0 +1,43 @@
+name: Unity Cloud connection
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unity-cloud-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UNITY_PROJECT_PATH: New Unity Project
+  UNITY_CLOUD_ORG: 7193a8c3-7e3a-41cb-0000-12405ce414db
+  UNITY_CLOUD_PROJECT: 5eff2aea-bc97-4492-9b91-da4a12055be2
+  UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.UNITY_SERVICE_ACCOUNT_ID }}
+  UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.UNITY_SERVICE_ACCOUNT_SECRET }}
+  UNITY_NON_INTERACTIVE: "1"
+  UNITY_NO_BANNER: "1"
+  UNITY_NO_CONSENT_PROMPT: "1"
+
+jobs:
+  verify-unity-cloud-link:
+    name: Verify Unity Cloud link
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Unity CLI
+        shell: bash
+        run: |
+          curl -fsSL https://public-cdn.cloud.unity3d.com/hub/prod/cli/install.sh -o "$RUNNER_TEMP/unity-cli-install.sh"
+          UNITY_CLI_CHANNEL=beta bash "$RUNNER_TEMP/unity-cli-install.sh"
+          echo "$HOME/.unity/bin" >> "$GITHUB_PATH"
+
+      - name: Verify linked Unity project
+        shell: bash
+        run: ./scripts/verify-unity-cloud.sh
