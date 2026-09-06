@@ -1,0 +1,94 @@
+UTC: 2026-09-05T16:14:43.9362504Z
+PASS Certification locked without mastery
+PASS Scene loaded 0
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for epinephrine
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 0
+PASS Patient stabilized 0
+PASS Perfect equipment-based training saves transient mastery: 0
+PASS Scene loaded 1
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for backblows
+PASS Equipment and contact target for thrusts
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 1
+PASS Patient stabilized 1
+PASS Perfect equipment-based training saves transient mastery: 1
+PASS Scene loaded 2
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for pressure
+PASS Equipment and contact target for tourniquet
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 2
+PASS Patient stabilized 2
+PASS Perfect equipment-based training saves transient mastery: 2
+PASS Scene loaded 3
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for pressure
+PASS Equipment and contact target for tourniquet
+PASS Equipment and contact target for preserve
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 3
+PASS Patient stabilized 3
+PASS Perfect equipment-based training saves transient mastery: 3
+PASS Scene loaded 4
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for shelter
+PASS Equipment and contact target for protect
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 4
+PASS Patient stabilized 4
+PASS Perfect equipment-based training saves transient mastery: 4
+PASS Five100% training results unlock certification
+PASS Certification starts after mastery
+PASS Scene loaded 1
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for backblows
+PASS Equipment and contact target for thrusts
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 1
+PASS Patient stabilized 1
+PASS Scene loaded 3
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for pressure
+PASS Equipment and contact target for tourniquet
+PASS Equipment and contact target for preserve
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 3
+PASS Patient stabilized 3
+PASS Scene loaded 2
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for pressure
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 2
+PASS Patient stabilized 2
+PASS Scene loaded 4
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for shelter
+PASS Equipment and contact target for protect
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 4
+PASS Patient stabilized 4
+PASS Scene loaded 0
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for epinephrine
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 0
+PASS Patient stabilized 0
+PASS Certification visits all5 exactly once
+PASS Final analytics receives five cases
+PASS Perfect certification earns practice CERTIFIED
+PASS All five original lobby windows connected at runtime
+PASS Lobby portal routes to case
+Hardware VR and manual controller gestures not tested.
