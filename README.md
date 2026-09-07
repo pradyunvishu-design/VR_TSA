@@ -19,7 +19,15 @@ unity projects info "New Unity Project" --json
 unity status
 ```
 
-## Check every GitHub push
+## Windows Codex workspace
+
+This checkout is connected to `origin/main` at `C:\VR_TSA`. Edit the repository project at `C:\VR_TSA\New Unity Project`. The separate local `My project` starter folder is not the repository project.
+
+`AGENTS.md` instructs Codex to verify, commit, and push its completed changes after each change task. This is an agent workflow, not a background file watcher; failed pushes must be resolved and retried.
+
+Unity CLI reads this same local project, so no second Git push to the CLI is needed. The repository requires Unity Editor `6000.5.10f1`; do not open it with a newer Editor unless intentionally upgrading.
+
+## GitHub push checks
 
 `.github/workflows/unity-cloud.yml` runs for every push. It installs Unity CLI, verifies the Unity project files, and checks that the committed organization and cloud project IDs have not drifted.
 
