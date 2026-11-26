@@ -19,3 +19,7 @@
 # OS files
 .DS_Store
 Thumbs.db
+
+# Local playtest builds, exports and Editor command scratch files
+/output/
+/tmp/
