@@ -1,5 +1,34 @@
-UTC: 2026-09-05T16:14:43.9362504Z
+UTC: 2026-11-25T20:24:31.1824517Z
+PASS Gallery signs respect depth behind menus and use a valid font atlas
+PASS Gallery walking surface matches shallow visible geometry: Gallery Floor
+PASS Gallery walking surface matches shallow visible geometry: Inset Floor
+PASS Gallery walking surface matches shallow visible geometry: Tree Well
+PASS Gallery walking surface matches shallow visible geometry: Soil Bed
+PASS World ray selects visible gallery exhibit Obstructed Airways
+PASS World ray selects visible gallery exhibit Anaphylaxis
+PASS World ray selects visible gallery exhibit Frostbite
+PASS World ray selects visible gallery exhibit Lost Limb
+PASS World ray selects visible gallery exhibit Traumatic Hemorrhaging
 PASS Certification locked without mastery
+PASS Opposite grip keeps the original hand and equipment
+PASS Original hand can return its tool after the other hand tries to grab
+PASS Opaque pause board intercepts hand rays and permits walking
+PASS Pause has a selectable spatial Resume button
+PASS Paused hand 0 selects Resume while still gripping equipment
+PASS Modal spatial input blocks world pickup for hand 0
+PASS Opaque pause board intercepts hand rays and permits walking
+PASS Pause has a selectable spatial Resume button
+PASS Paused hand 1 selects Resume while still gripping equipment
+PASS Modal spatial input blocks world pickup for hand 1
+PASS Spatial triage requires inspection before prioritization
+PASS Spatial inspection selects the displayed A/B/C slot 0
+PASS Spatial inspection selects the displayed A/B/C slot 1
+PASS Spatial inspection selects the displayed A/B/C slot 2
+PASS Bystander inspection cannot replace selected patient findings during care
+PASS Animated ROOK card shows the placement correction
+PASS Wrong anatomical placement penalized without advancing
+PASS Incorrect treatment worsens state
+PASS Critical placement mistake prevents mastery
 PASS Scene loaded 0
 PASS Equipment and contact target for safety
 PASS Equipment and contact target for call
@@ -47,14 +76,40 @@ PASS Patient stabilized 4
 PASS Perfect equipment-based training saves transient mastery: 4
 PASS Five100% training results unlock certification
 PASS Certification starts after mastery
+PASS Triage button slots follow visible patient letters in case 0
+PASS Instructor hidden throughout certification case 0
+PASS Certification onset has neutral feedback
+PASS Scene loaded 0
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for epinephrine
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 0
+PASS Patient stabilized 0
+PASS Triage button slots follow visible patient letters in case 2
+PASS Instructor hidden throughout certification case 2
+PASS Certification onset has neutral feedback
+PASS Scene loaded 2
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for pressure
+PASS Equipment and contact target for tourniquet
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 2
+PASS Patient stabilized 2
+PASS Triage button slots follow visible patient letters in case 1
+PASS Instructor hidden throughout certification case 1
+PASS Certification onset has neutral feedback
 PASS Scene loaded 1
 PASS Equipment and contact target for safety
 PASS Equipment and contact target for call
 PASS Equipment and contact target for backblows
-PASS Equipment and contact target for thrusts
 PASS Equipment and contact target for monitor
 PASS All real treatment handlers finish 1
 PASS Patient stabilized 1
+PASS Triage button slots follow visible patient letters in case 3
+PASS Instructor hidden throughout certification case 3
+PASS Certification onset has neutral feedback
 PASS Scene loaded 3
 PASS Equipment and contact target for safety
 PASS Equipment and contact target for call
@@ -64,13 +119,9 @@ PASS Equipment and contact target for preserve
 PASS Equipment and contact target for monitor
 PASS All real treatment handlers finish 3
 PASS Patient stabilized 3
-PASS Scene loaded 2
-PASS Equipment and contact target for safety
-PASS Equipment and contact target for call
-PASS Equipment and contact target for pressure
-PASS Equipment and contact target for monitor
-PASS All real treatment handlers finish 2
-PASS Patient stabilized 2
+PASS Triage button slots follow visible patient letters in case 4
+PASS Instructor hidden throughout certification case 4
+PASS Certification onset has neutral feedback
 PASS Scene loaded 4
 PASS Equipment and contact target for safety
 PASS Equipment and contact target for call
@@ -79,16 +130,59 @@ PASS Equipment and contact target for protect
 PASS Equipment and contact target for monitor
 PASS All real treatment handlers finish 4
 PASS Patient stabilized 4
-PASS Scene loaded 0
-PASS Equipment and contact target for safety
-PASS Equipment and contact target for call
-PASS Equipment and contact target for epinephrine
-PASS Equipment and contact target for monitor
-PASS All real treatment handlers finish 0
-PASS Patient stabilized 0
 PASS Certification visits all5 exactly once
 PASS Final analytics receives five cases
 PASS Perfect certification earns practice CERTIFIED
+PASS Spatial analytics page navigation 1
+PASS Spatial analytics page reports the recorded case and metrics for 0
+PASS Spatial page has bounded, fit-to-width text 1
+PASS Spatial analytics page navigation 2
+PASS Spatial analytics page reports the recorded case and metrics for 2
+PASS Spatial page has bounded, fit-to-width text 2
+PASS Spatial analytics page navigation 3
+PASS Spatial analytics page reports the recorded case and metrics for 1
+PASS Spatial page has bounded, fit-to-width text 3
+PASS Spatial analytics page navigation 4
+PASS Spatial analytics page reports the recorded case and metrics for 3
+PASS Spatial page has bounded, fit-to-width text 4
+PASS Spatial analytics page navigation 5
+PASS Spatial analytics page reports the recorded case and metrics for 4
+PASS Spatial page has bounded, fit-to-width text 5
+PASS Right-hand trigger returns from the last case to the spatial summary
+PASS Analytics export round-trips all five cases and action histories
 PASS All five original lobby windows connected at runtime
-PASS Lobby portal routes to case
+PASS World entrance cannot dismiss the certification dashboard
+PASS Original exhibit loaded 0
+PASS Original exhibit opens matching case 0
+PASS Return entrance present 0
+PASS Paused room ignores world entrance 0
+PASS Return entrance opens hub 0
+PASS Original exhibit loaded 1
+PASS Original exhibit opens matching case 1
+PASS Return entrance present 1
+PASS Paused room ignores world entrance 1
+PASS Return entrance opens hub 1
+PASS Original exhibit loaded 2
+PASS Original exhibit opens matching case 2
+PASS Return entrance present 2
+PASS Paused room ignores world entrance 2
+PASS Return entrance opens hub 2
+PASS Original exhibit loaded 3
+PASS Original exhibit opens matching case 3
+PASS Return entrance present 3
+PASS Paused room ignores world entrance 3
+PASS Return entrance opens hub 3
+PASS Original exhibit loaded 4
+PASS Original exhibit opens matching case 4
+PASS Return entrance present 4
+PASS Paused room ignores world entrance 4
+PASS Return entrance opens hub 4
+PASS Mastery permits a second certification attempt
+PASS Certification timeout records an incomplete case 0
+PASS Certification timeout records an incomplete case 1
+PASS Certification timeout records an incomplete case 2
+PASS Certification timeout records an incomplete case 3
+PASS Certification timeout records an incomplete case 4
+PASS Failed certification reports missed priority, diagnosis and timeouts
+PASS Returning to lobby remains stable without movement
 Hardware VR and manual controller gestures not tested.

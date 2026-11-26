@@ -1,0 +1,13 @@
+FIRST180 interior scenery, personal practice build
+
+Kenney Furniture Kit 2.0
+https://kenney.nl/assets/furniture-kit
+Original author: Kenney. License: Creative Commons Zero (CC0).
+Selected furniture meshes retain their source geometry and normals. The furniture palette was adapted to walnut, clay and soft green. Mesh pivots were centered under each prop, names grouped, and UVs on the furniture adjusted to share a single palette.
+
+Kenney Food Kit 2.0
+https://kenney.nl/assets/food-kit
+Original author: Kenney. License: Creative Commons Zero (CC0).
+Selected kitchen and meal meshes use their original palette and UV coordinates. Mesh pivots were centered for tabletop placement.
+
+Each kit's original License.txt is included beside its meshes. The interiors use custom room layouts, storefront lettering, cabinet placement and architectural finishes.

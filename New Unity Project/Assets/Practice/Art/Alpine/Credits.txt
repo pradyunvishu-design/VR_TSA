@@ -1,0 +1,12 @@
+North Ridge winter refuge
+Practice environment for FIRST180
+
+SnowlineForest.obj incorporates four mesh designs from Nature Kit 2.1 by Kenney.
+tree_pineTallA_detailed, tree_pineRoundC, tree_pineSmallA, stone_largeA
+https://kenney.nl/assets/nature-kit
+Distribution by Kenney: https://opengameart.org/content/nature-kit
+License: Creative Commons CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/
+The original license accompanies this file.
+
+The four meshes were resized, arranged into groves and scree, remapped to the North Ridge palette, and given face-fitted asymmetric snow cover. The refuge, furniture, lamps, wayfinding, terrain, trail, mountain skyline, snow particles and palette were created for this practice scene. Source~/build_shelter.py rebuilds the editable mesh groups from the original ZIP with Python, numpy and Pillow.

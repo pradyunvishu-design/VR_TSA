@@ -83,13 +83,13 @@ namespace First180.Practice.Editor
                     Box("Cafe counter",new Vector3(-7, .6f,4),new Vector3(3,1.2f,6),wood);
                     Box("Stone counter top",new Vector3(-7,1.24f,4),new Vector3(3.15f,.12f,6.15f),cream);
                     Box("Espresso machine",new Vector3(-7,1.65f,6),new Vector3(1.1f,.7f,.65f),metal);
-                    Text("Cafe sign","JUNIPER\nCOFFEE & KITCHEN",new Vector3(-6.5f,3.4f,8.5f),.13f,null,Color.black);
+                    Text("Cafe sign","SWITCHBACK\nCOFFEE",new Vector3(-6.5f,3.4f,8.5f),.13f,null,Color.black);
                     for(int i=0;i<3;i++){Table(new Vector3(5,0,-2+i*3),true);Chair(new Vector3(5,0,-3+i*3));}
                     Table(new Vector3(-1,0,3),true);Plant(new Vector3(8,0,7));
                     Shape("Allergen snack plate",PrimitiveType.Cylinder,new Vector3(-1,.9f,3),new Vector3(.4f,.025f,.4f),cream);
                     break;
                 case 1:
-                    Text("Commons sign","THE COMMONS / DINING",new Vector3(0,3.8f,8.5f),.16f,null,Color.black);
+                    Text("Commons sign","RELAY HALL / DINING",new Vector3(0,3.8f,8.5f),.16f,null,Color.black);
                     for(int x=-6;x<=6;x+=6)for(int z=2;z<=6;z+=4){Table(new Vector3(x,0,z));Chair(new Vector3(x,0,z-1));Chair(new Vector3(x,0,z+1));}
                     Box("Serving station",new Vector3(-8,.6f,4),new Vector3(2,1.2f,6),wood);Plant(new Vector3(8,0,7));break;
                 case 2:
@@ -144,6 +144,7 @@ namespace First180.Practice.Editor
             Shape("Ceramic body",PrimitiveType.Sphere,Vector3.zero,new Vector3(.55f,.45f,.4f),cream,root.transform);
             Box("Face screen",new Vector3(0,.04f,-.2f),new Vector3(.37f,.16f,.045f),dark,root.transform);
             foreach(float x in new[]{-.09f,.09f})Shape("Optic",PrimitiveType.Sphere,new Vector3(x,.055f,-.23f),new Vector3(.05f,.05f,.02f),teal,root.transform);
+            root.SetActive(false);
             Shape("Hover base",PrimitiveType.Cylinder,new Vector3(0,-.27f,0),new Vector3(.36f,.045f,.36f),teal,root.transform);
         }
         static void ReturnPortal()

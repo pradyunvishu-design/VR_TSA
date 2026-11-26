@@ -38,6 +38,7 @@ namespace First180.Practice.Editor
                 Check(room.config && room.patients.Length==3,"Config and three patients");
                 Check(room.GetComponent<TreatmentManager>() && room.GetComponent<TrainingManager>() && room.GetComponent<SpatialPanel>(),"Reusable systems installed");
                 Check(UnityEngine.Object.FindFirstObjectByType<VRInteractionManager>()!=null,"XR rig present");
+                VerifyCast(room);
                 foreach(var action in d.actions)Check(UnityEngine.Object.FindObjectsByType<TreatmentTool>(FindObjectsSortMode.None).Any(t=>t.actionId==action),"Tool for "+action);
                 foreach(var root in scene.GetRootGameObjects())foreach(var transform in root.GetComponentsInChildren<Transform>(true))Check(GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(transform.gameObject)==0,"No missing scripts");
             }
@@ -46,5 +47,57 @@ namespace First180.Practice.Editor
             File.WriteAllText(output,"UTC: "+DateTime.UtcNow.ToString("o")+"\nPASS: "+assertions+" logic and serialized-scene assertions\nHardware VR not tested.\n");
             Debug.Log("PRACTICE_ASSERTIONS_PASSED="+assertions);
         }
+
+        static void VerifyCast(PracticeRoom room)
+        {
+            Physics.SyncTransforms();
+            var robot = room.GetComponent<PracticeAudio>().robot;
+            Check(robot && !robot.gameObject.activeSelf, "Instructor is off the scenario floor");
+            Check(Resources.Load<Texture2D>("RookInstructor") && Resources.Load<Texture2D>("RookAnimation"), "ROOK portrait and animation atlas included");
+            Check(UnityEngine.Object.FindObjectsByType<PracticePatient>(FindObjectsSortMode.None).All(room.patients.Contains), "Every person is in the scenario cast");
+            var castMeshes = new[] { "Boy", "Girl", "Man", "Woman" }.Select(name =>
+                AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Practice/Characters/" + name + ".prefab")
+                    .GetComponent<MeshFilter>().sharedMesh).ToArray();
+            foreach (var patient in room.patients)
+            {
+                var visual = patient.characterVisual;
+                Check(visual && visual.sharedMesh && visual.GetComponent<MeshRenderer>().sharedMaterial.mainTexture, "Textured patient mesh");
+                Check(castMeshes.Contains(visual.sharedMesh) && !visual.GetComponent<MeshRenderer>().enabled,
+                    "Supplied static mesh retained as fallback");
+                var animated = patient.GetComponent<CasePatientAnimation>();
+                var skins = patient.GetComponentsInChildren<SkinnedMeshRenderer>();
+                Check(animated && skins.Count(s => s.enabled) == 1 && skins.All(s => s.sharedMesh && s.sharedMaterial.mainTexture),
+                    "One textured skinned person is visible");
+                bool workshopLead = room.scenarioId == 3 && patient.patientId == 0;
+                int expectedSkins = visual.name == "Woman" ? 3 : 1;
+                if (visual.name == "Man" && (workshopLead || patient.patientId != 0)) expectedSkins = 2;
+                Check(skins.Length == expectedSkins, "Expected rig mesh layout");
+                if (workshopLead)
+                {
+                    var intact = skins.Single(s => s.name == "Intact");
+                    var injured = skins.Single(s => s.name == "Injured");
+                    Check(intact.enabled && !injured.enabled && intact.bones.SequenceEqual(injured.bones),
+                        "Workshop meshes share one skeleton");
+                    Check(patient.GetComponentsInChildren<TreatmentTarget>().Single(t => t.Accepts("preserve"))
+                        .transform.Find("Recovery container visual"), "Workshop preservation target has a matching prop");
+                }
+                Check(patient.GetComponentsInChildren<MeshRenderer>().Where(r => r.enabled)
+                    .All(r => r.gameObject == visual.gameObject || r.GetComponent<TextMesh>() || r.GetComponent<TreatmentTarget>()
+                        || r.gameObject == patient.injuryVisual || r.GetComponentInParent<TreatmentTarget>()), "No extra visible mannequin parts");
+                Check((bool)patient.incidentAppearance == (room.scenarioId == 3 && patient.patientId == 0), "Workshop incident appearance");
+                foreach (var target in patient.GetComponentsInChildren<TreatmentTarget>())
+                {
+                    if (target.Accepts("preserve")) continue; // Equipment container, separate from the anatomy.
+                    Vector3 direction = target.Accepts("backblows") ? Vector3.back : Vector3.forward;
+                    Vector3 origin = target.transform.position - direction * .32f;
+                    bool hitTarget = Physics.Raycast(origin, direction, out var hit, .5f, ~0, QueryTriggerInteraction.Collide)
+                        && hit.transform == target.transform;
+                    Check(hitTarget, room.name + " / " + patient.name + " / " + target.anatomicalSite + " reachable");
+                }
+            }
+        }
     }
 }
+
+
+

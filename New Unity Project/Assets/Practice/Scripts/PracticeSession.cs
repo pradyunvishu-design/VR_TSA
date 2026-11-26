@@ -9,7 +9,10 @@ namespace First180.Practice
     public class PracticeSession : MonoBehaviour
     {
         public static PracticeSession Instance { get; private set; }
-        public bool certification, loading, dashboard;
+        public bool certification, dashboard;
+        bool transitioning;
+        internal LobbyConnections loadingHub;
+        public bool loading => transitioning || (loadingHub && !loadingHub.Ready);
         public bool muted;
         [NonSerialized] public bool testMode;
         public int pendingId=-1, round;
@@ -36,13 +39,13 @@ namespace First180.Practice
         public void StartTraining(int id)
         {
             if(loading || id<0 || id>=5) return;
-            certification=false;dashboard=false;results.Clear();pendingId=id;
+            certification=false;dashboard=false;results.Clear();exportStatus="";pendingId=id;
             Load(ScenarioCatalog.All[id].scene);
         }
         public bool StartCertification()
         {
             if(!CanCertify || loading) return false;
-            certification=true;dashboard=false;results.Clear();round=0;
+            certification=true;dashboard=false;results.Clear();exportStatus="";round=0;
             order=PracticeRules.ShuffledOrder(new System.Random());pendingId=order[round];
             Load(ScenarioCatalog.All[pendingId].scene);
             return true;
@@ -68,6 +71,7 @@ namespace First180.Practice
         }
         public void BackToHub()
         {
+            if(loading) return;
             certification=false;dashboard=false;pendingId=-1;Load(ScenarioCatalog.Hub);
         }
         public void Load(string scene)
@@ -77,11 +81,11 @@ namespace First180.Practice
         }
         System.Collections.IEnumerator LoadAsync(string scene)
         {
-            loading=true;
+            transitioning=true;
             yield return null;
             var operation=SceneManager.LoadSceneAsync(scene);
             if(operation!=null) while(!operation.isDone) yield return null;
-            loading=false;
+            transitioning=false;
         }
         [Serializable] class Report
         {
@@ -95,13 +99,17 @@ namespace First180.Practice
             try
             {
                 string path=Path.Combine(Application.persistentDataPath,"First180Practice");
-                Directory.CreateDirectory(path);
-                var report=new Report {generatedUtc=DateTime.UtcNow.ToString("o"),mode=certification?"Certification":"Training",trainingBest=best,cases=results};
-                string file=Path.Combine(path,"latest-"+(certification?"certification":"training")+".json");
-                File.WriteAllText(file,JsonUtility.ToJson(report,true));
-                exportStatus=file;
+                exportStatus=WriteReport(path);
             }
             catch(Exception error) { exportStatus="Export failed: "+error.Message;Debug.LogWarning(exportStatus); }
+        }
+        internal string WriteReport(string directory)
+        {
+            Directory.CreateDirectory(directory);
+            var report=new Report {generatedUtc=DateTime.UtcNow.ToString("o"),mode=certification?"Certification":"Training",trainingBest=best,cases=results};
+            string file=Path.Combine(directory,"latest-"+(certification?"certification":"training")+".json");
+            File.WriteAllText(file,JsonUtility.ToJson(report,true));
+            return file;
         }
         public void ResetTraining()
         {
