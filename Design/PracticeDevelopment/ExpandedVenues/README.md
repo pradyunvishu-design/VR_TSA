@@ -1,5 +1,9 @@
 # Exploring the expanded PULSE scenarios
 
+[Download the three-page development report](../ScenarioRoutines/PULSE-development-report.pdf) · [Download the report and all 29 captioned screenshots](PULSE-documentation-and-screenshots.zip)
+
+The ZIP includes ten Play Mode captures from the expansion and nineteen captures from earlier milestones. Each set has its own captions and test records.
+
 Players arrive in the new public area. Each scenario contains twelve team characters: two adults perform ordinary jobs and can become the priority patient, a third character has a clinical assessment, and nine other people can be approached and checked. Local activities include reading a ridge map, carrying food, inspecting tools and moving parcels. Clothing colors vary independently of the incident.
 
 The patient can be in the original venue or its new south area. A/B/C identifiers are independent of location. A learner must get within 3.2 m and have the person in sight to obtain findings. Healthy bystanders can answer without entering the treatment sequence. Heartbeat and breathing sources follow the affected person. Each area has its own working response cart.
