@@ -19,7 +19,7 @@ namespace First180.Practice
         {
             new ScenarioDefinition {
                 id=0, title="Anaphylaxis", location="Switchback Coffee", scene="Cafe_Anaphylaxis",
-                normal="A customer is enjoying lunch. The cafe is quiet.",
+                normal="The café is open. People collect drinks at the counter and carry them through the reading room.",
                 incident="A customer suddenly struggles to breathe after eating.",
                 symptoms="Swollen lips, hives and noisy breathing after a known allergen. The patient has a prescribed auto-injector.",
                 actions=new[]{"safety","call","epinephrine","monitor"},
@@ -27,7 +27,7 @@ namespace First180.Practice
             },
             new ScenarioDefinition {
                 id=1, title="Obstructed Airways", location="Relay Hall", scene="Dining_ObstructedAirways",
-                normal="Guests are talking over a meal in the dining hall.",
+                normal="Lunch is underway. Follow the tray line between the serving hall and the south commons.",
                 incident="A diner stands up, grabs their throat and cannot speak.",
                 symptoms="A responsive adult cannot speak, breathe or cough effectively after taking a bite. No allergy signs.",
                 actions=new[]{"safety","call","backblows","thrusts","monitor"},
@@ -35,7 +35,7 @@ namespace First180.Practice
             },
             new ScenarioDefinition {
                 id=2, title="Traumatic Hemorrhaging", location="Riverside Service Road", scene="Road_Hemorrhaging",
-                normal="A delivery van has stopped beside road maintenance barriers.",
+                normal="A van has arrived. Walk the loading lane and parcel exchange as the crew sorts deliveries.",
                 incident="A crash is heard. A worker has a serious arm wound.",
                 symptoms="Continuous heavy bleeding from the forearm, pale skin and dizziness. Bleeding continues despite pressure in this scripted case.",
                 actions=new[]{"safety","call","pressure","tourniquet","monitor"},
@@ -43,7 +43,7 @@ namespace First180.Practice
             },
             new ScenarioDefinition {
                 id=3, title="Lost Limb", location="Fabrication Workshop", scene="Workshop_LostLimb",
-                normal="A workshop demonstration is underway. Machines are behind guards.",
+                normal="The workshop is running. Workers move between the tool benches and the assembly floor.",
                 incident="Equipment stops with a bang. A worker has an amputated forearm.",
                 symptoms="Traumatic forearm amputation with severe bleeding. The machine is isolated. The detached part is nearby.",
                 actions=new[]{"safety","call","pressure","tourniquet","preserve","monitor"},
@@ -51,7 +51,7 @@ namespace First180.Practice
             },
             new ScenarioDefinition {
                 id=4, title="Frostbite", location="Alpine Trail Shelter", scene="Trail_Frostbite",
-                normal="Hikers arrive at a trail shelter as snow starts to fall.",
+                normal="Hikers are arriving at the refuge. The marked trail leads out to North Ridge Lookout.",
                 incident="A hiker removes a glove and notices numb, waxy fingers.",
                 symptoms="An alert hiker has cold, numb, pale waxy fingers after freezing exposure. No confusion or severe shivering in this case.",
                 actions=new[]{"safety","call","shelter","protect","monitor"},

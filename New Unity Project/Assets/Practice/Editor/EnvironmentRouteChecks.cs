@@ -28,6 +28,11 @@ namespace First180.Practice.Editor
                         throw new InvalidOperationException("Missing room art in " + scene.name);
                     ScenarioBayArchitecture.Verify(room, GameObject.Find("Location art").transform);
                     var gear = UnityEngine.Object.FindObjectsByType<TreatmentTool>(FindObjectsSortMode.None);
+                    var satellite = gear.Where(tool => tool.transform.position.z < -11).ToArray();
+                    var originalKit = gear.Where(tool => tool.transform.position.z >= -11).ToArray();
+                    if (satellite.Length == 0 || !satellite.Select(tool => tool.actionId).OrderBy(x=>x)
+                        .SequenceEqual(originalKit.Select(tool=>tool.actionId).OrderBy(x=>x)))
+                        throw new InvalidOperationException("The original and south carts must stock the same equipment");
                     if (gear.Length == 0 || gear.Any(g => !g.transform.Find("Equipment model") || !g.GetComponentInChildren<Collider>()))
                         throw new InvalidOperationException("Missing tool art or pickup collider in " + scene.name);
                     Physics.SyncTransforms();
@@ -62,16 +67,18 @@ namespace First180.Practice.Editor
                     var portal = UnityEngine.Object.FindObjectsByType<PracticePortal>(FindObjectsSortMode.None).Single(p => p.returnToHub);
                     Check(Near(portal.transform.position,1.35f),"return portal");
                     if(room.scenarioId == 4) Check(Near(new Vector3(-5,.2f,3),.8f),"shelter handoff");
-                    // Exercise each actor at both marks in each of the three aisles, including
-                    // the lead's treatment sockets at every possible starting position.
+                    int extensionCells = reachable.Count(cell => cell.y < -22);
+                    Check(extensionCells * .25f >= 140f, "140 square metres of reachable new space south of z=-11");
+                    Debug.Log("EXPANDED_FLOOR="+scene.name+" / reachable extension "+(extensionCells*.25f)+" square metres");
+                    // Exercise both variations of the three original stations and the new area.
                     var originalPositions = room.patients.Select(p => p.transform.position).ToArray();
                     try
                     {
                         for (int variation = 0; variation < 2; variation++)
-                        for (int shift = 0; shift < 3; shift++)
+                        for (int shift = 0; shift < 4; shift++)
                         {
                             foreach (var patient in room.patients)
-                                patient.transform.position = room.PatientMark((patient.patientId+shift)%3, variation);
+                                patient.transform.position = room.PatientMark((patient.patientId+shift)%4, variation);
                             Physics.SyncTransforms();
                             reachable = Flood(entry);
                             string layout = "placement "+variation+"/"+shift;
@@ -92,7 +99,7 @@ namespace First180.Practice.Editor
                         for (int i=0; i<room.patients.Length; i++) room.patients[i].transform.position = originalPositions[i];
                         Physics.SyncTransforms();
                     }
-                    Debug.Log("PATIENT_MARKS_PASS="+scene.name+" / six verified marks per patient");
+                    Debug.Log("PATIENT_MARKS_PASS="+scene.name+" / eight verified marks per patient");
                     Debug.Log("LOCATION_ROUTES_PASS=" + scene.name + " / " + gear.Length + " tools, three patients, return portal");
                     void Check(bool passed, string target)
                     {
@@ -103,12 +110,47 @@ namespace First180.Practice.Editor
             finally { EditorSceneManager.OpenScene(original); }
         }
 
+        // In Play Mode, move the real capsule along a connected route through the new entrance.
+        internal static void WalkAcrossVenue(PracticePlayer player)
+        {
+            var controller = player.GetComponent<CharacterController>();
+            Vector3 spawn = player.transform.position;
+            var start = new Vector2Int(Mathf.RoundToInt(spawn.x*2), Mathf.RoundToInt(spawn.z*2));
+            var previous = new Dictionary<Vector2Int, Vector2Int>();
+            var reachable = Flood(start, previous);
+            var target = reachable.Where(cell => cell.y >= -4).OrderBy(cell => (cell - new Vector2Int(-4, -2)).sqrMagnitude).First();
+            var path = new Stack<Vector2Int>();
+            for (var cell=target; cell!=start; cell=previous[cell]) path.Push(cell);
+            try
+            {
+                foreach (var cell in path)
+                {
+                    var waypoint = new Vector3(cell.x * .5f, player.transform.position.y, cell.y * .5f);
+                    controller.Move(waypoint - player.transform.position + Vector3.down * .04f);
+                    if (Vector2.Distance(new Vector2(waypoint.x,waypoint.z),
+                        new Vector2(player.transform.position.x,player.transform.position.z)) > .36f)
+                        throw new InvalidOperationException("Player capsule blocked at " + waypoint);
+                }
+                if (player.transform.position.z < -2.5f || spawn.z > -20f)
+                    throw new InvalidOperationException("Walk did not connect the extension and original venue");
+                Debug.Log("PLAYER_CROSSING_PASS=" + player.gameObject.scene.name + " / " + path.Count + " half-metre steps");
+            }
+            finally
+            {
+                controller.enabled = false;
+                player.transform.position = spawn;
+                controller.enabled = true;
+                Physics.SyncTransforms();
+            }
+        }
+
         // Half-metre walking grid. Ignore low step surfaces and the actor's own controller.
-        static HashSet<Vector2Int> Flood(Vector2Int start)
+        static HashSet<Vector2Int> Flood(Vector2Int start, Dictionary<Vector2Int, Vector2Int> previous = null)
         {
             var visited = new HashSet<Vector2Int> { start };
             var reachable = new HashSet<Vector2Int>();
             var pending = new Queue<Vector2Int>();
+            visited.Add(start);
             pending.Enqueue(start);
             var directions = new[] {Vector2Int.up,Vector2Int.down,Vector2Int.left,Vector2Int.right};
             while(pending.Count != 0)
@@ -122,7 +164,8 @@ namespace First180.Practice.Editor
                 foreach (var direction in directions)
                 {
                     var next = cell + direction;
-                    if (Mathf.Abs(next.x)>19 || Mathf.Abs(next.y)>17 || !visited.Add(next)) continue;
+                    if (Mathf.Abs(next.x)>19 || next.y < -53 || next.y>17 || !visited.Add(next)) continue;
+                    if (previous != null) previous[next] = cell;
                     pending.Enqueue(next);
                 }
             }

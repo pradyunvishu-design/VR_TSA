@@ -26,7 +26,7 @@ namespace First180.Practice
         public string feedback="", observation="";
         public int PatientInSlot(int slot)
         {
-            // The A/B/C markers are ordered left to right from the entrance.
+            // Both interfaces list patient records alphabetically.
             return System.Array.IndexOf(patientLabels, ((char)('A' + slot)).ToString());
         }
         string updatedObservation;
@@ -93,7 +93,7 @@ namespace First180.Practice
                         {
                             Vector3 relative = eye.transform.InverseTransformPoint(patients[0].transform.position);
                             string direction = relative.z < 0f ? "behind you" : relative.x < 0f ? "to your left" : "to your right";
-                            instructor.Present("Look " + direction + " and watch how the person moves.");
+                            instructor.Present("Explore the area " + direction + ". Watch how people move and breathe.");
                             promptedToLook = true;
                         }
                     }
@@ -109,9 +109,14 @@ namespace First180.Practice
             if(scenarioId<0 || EmergencyActive) return;
             if (routine) routine.InterruptForCare();
             EmergencyActive=true;elapsed=0;
-            if(incidentRoot) incidentRoot.SetActive(true);
+            observation="";
+            if (incidentRoot && !session.certification)
+            {
+                incidentRoot.transform.position = patients[0].transform.position + Vector3.up * 3.4f;
+                incidentRoot.SetActive(true);
+            }
             audioSystem.SignalIncident(patients[0].transform);
-            feedback = session.certification ? "Incident active." : "ROOK: Inspect the patients and choose who needs care first.";
+            feedback = session.certification ? "Incident active." : "ROOK: Walk through the scene. Look for a change in breathing, posture or movement, then check the person up close.";
             PresentInstruction();
         }
         bool LeadInView(Camera eye)
@@ -131,16 +136,50 @@ namespace First180.Practice
             if (!instructor || session.certification) return;
             instructor.Present(feedback);
         }
+        public const string SearchPrompt = "Walk up to someone and inspect them to record what you see.";
+        public string SearchFindings => string.IsNullOrEmpty(observation) ? SearchPrompt : observation;
+        public string LocationBrief => string.IsNullOrEmpty(observation) ? Definition.normal : observation;
+
+        public bool CanObserve(Transform person)
+        {
+            Camera eye = Camera.main;
+            if (!eye || !person) return false;
+            Vector3 subject = person.position + Vector3.up * 1.2f;
+            Vector3 offset = subject - eye.transform.position;
+            if (offset.sqrMagnitude > 3.2f * 3.2f) return false;
+            Vector3 screen = eye.WorldToViewportPoint(subject);
+            if (screen.z <= 0 || screen.x < 0 || screen.x > 1 || screen.y < 0 || screen.y > 1) return false;
+            return !Physics.Linecast(eye.transform.position, subject, out var hit, eye.cullingMask,
+                QueryTriggerInteraction.Ignore) || hit.transform.IsChildOf(person);
+        }
+
+        public void InspectBystander(CrowdBystander bystander)
+        {
+            if (!bystander || result != null || encounter == null || encounter.SelectedPatient >= 0) return;
+            inspected = -1;
+            observation = CanObserve(bystander.transform) ? bystander.Observation : SearchPrompt;
+        }
         public void Inspect(int id)
         {
-            if(!EmergencyActive || result!=null || id<0 || id>2) return;
+            if(result!=null || id<0 || id>2 || encounter==null) return;
             if(encounter.SelectedPatient>=0 && encounter.SelectedPatient!=id) return;
+            if (!CanObserve(patients[id].transform))
+            {
+                if (encounter.SelectedPatient < 0) inspected = -1;
+                observation = SearchPrompt;
+                return;
+            }
+            if (!EmergencyActive)
+            {
+                observation = "They respond to you and continue with what they were doing.";
+                return;
+            }
             inspected=id;
             observation=id==0?(updatedObservation ?? Definition.symptoms):id==1?"Alert, speaking in full sentences. Small superficial hand scrape, no heavy bleeding.":"Walking and talking normally. Shaken by the incident but reports no injury.";
         }
         public void ChoosePatient(int id)
         {
-            if(!EmergencyActive || result!=null || encounter.SelectedPatient>=0) return;
+            if(!EmergencyActive || result!=null || encounter.SelectedPatient>=0 || inspected != id || id < 0) return;
             bool correct=encounter.ChoosePatient(id,elapsed);
             if(encounter.SelectedPatient>=0) Inspect(encounter.SelectedPatient);
             feedback=session.certification?"Patient selection recorded.":correct?"ROOK: Correct priority. Identify the main condition.":"ROOK: Breathing compromise or uncontrolled bleeding takes priority over minor injuries. Inspect again.";

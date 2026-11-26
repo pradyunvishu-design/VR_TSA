@@ -94,6 +94,37 @@ namespace First180.Practice
             return map;
         }
 
+        public Vector3 PublicCounter(int venue)
+        {
+            var counter = Group(new[] { "Coffee pickup ledge", "Family lunch counter", "Collection desk",
+                "Service parts desk", "Ridge map table" }[venue], new Vector3(-8f, 0f, -16.1f));
+            Part(counter, "Worktop", new Vector3(0,.91f,0), new Vector3(.68f,.065f,1.32f), art.linen);
+            foreach (float end in new[] { -.52f, .52f })
+                Part(counter, "End support", new Vector3(0,.445f,end), new Vector3(.53f,.87f,.095f), art.metal);
+            var body = counter.gameObject.AddComponent<BoxCollider>();
+            body.center = new Vector3(0,.46f,0);
+            body.size = new Vector3(.67f,.92f,1.31f);
+            var spare = CrowdProp(venue, counter, counter.position + new Vector3(-.09f,1f,.44f));
+            float floor = spare.GetComponentInChildren<MeshRenderer>().bounds.min.y;
+            spare.position += Vector3.up * (.943f - floor);
+            return counter.position + new Vector3(.20f,.943f,-.11f);
+        }
+
+        public Transform CrowdProp(int venue, Transform parent, Vector3 at)
+        {
+            switch (venue)
+            {
+                case 0: return art.Create(0, parent, "Coffee cup", at);
+                case 1: return art.Create(1, parent, "Cafeteria tray", at);
+                case 2: return art.Create(3, parent, "Parcel", at);
+                case 3: return art.Create(4, parent, "Fitting tool", at);
+                default:
+                    var map = TrailMap(at);
+                    map.SetParent(parent, true);
+                    return map;
+            }
+        }
+
         public Transform DispatchTrolley(Vector3 at)
         {
             var trolley = Group("Loading lane parcel trolley", at);

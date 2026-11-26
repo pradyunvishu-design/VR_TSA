@@ -41,3 +41,9 @@ MonoBehaviour:
   metal: {fileID: 2100000, guid: 5c05b28e44763734a9a808f8363e2e9d, type: 2}
   charcoal: {fileID: 2100000, guid: 3a37f3faf2dc35d4a96c147f5580fb4d, type: 2}
   lettering: {fileID: 2100000, guid: 2ef92978c0d1a154ca2fa699f19558ae, type: 2}
+  shirts:
+  - {fileID: 2100000, guid: ca3b3c39fa03c4e46b283e7a874cb683, type: 2}
+  - {fileID: 2100000, guid: 8e30cafaac1f4c0c9fc5667344cfd5e7, type: 2}
+  - {fileID: 2100000, guid: 859fb02409f04fcf9bbf1450063e321d, type: 2}
+  - {fileID: 2100000, guid: bde0e553354d4790b288d8a4124ad45c, type: 2}
+  - {fileID: 2100000, guid: fc36ef4dd3e649179c383143aa758eda, type: 2}

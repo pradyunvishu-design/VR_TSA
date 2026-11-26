@@ -10,6 +10,7 @@ namespace First180.Practice
         [SerializeField] Item[] items;
         public GameObject girl, boy;
         public Material cast, enamel, linen, metal, charcoal, lettering;
+        public Material[] shirts;
 
         public Transform Create(int index, Transform parent, string label, Vector3 center)
         {

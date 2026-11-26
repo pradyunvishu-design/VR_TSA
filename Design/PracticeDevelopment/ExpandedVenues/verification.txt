@@ -1,0 +1,113 @@
+PULSE expanded venues | Windows x64 | Unity 6000.5.10f1
+
+EXPANDED_FLOOR=Cafe_Anaphylaxis / reachable extension 250 square metres
+PATIENT_MARKS_PASS=Cafe_Anaphylaxis / eight verified marks per patient
+LOCATION_ROUTES_PASS=Cafe_Anaphylaxis / 10 tools, three patients, return portal
+EXPANDED_FLOOR=Dining_ObstructedAirways / reachable extension 244.5 square metres
+PATIENT_MARKS_PASS=Dining_ObstructedAirways / eight verified marks per patient
+LOCATION_ROUTES_PASS=Dining_ObstructedAirways / 12 tools, three patients, return portal
+EXPANDED_FLOOR=Road_Hemorrhaging / reachable extension 261.5 square metres
+PATIENT_MARKS_PASS=Road_Hemorrhaging / eight verified marks per patient
+LOCATION_ROUTES_PASS=Road_Hemorrhaging / 14 tools, three patients, return portal
+EXPANDED_FLOOR=Workshop_LostLimb / reachable extension 246.5 square metres
+PATIENT_MARKS_PASS=Workshop_LostLimb / eight verified marks per patient
+LOCATION_ROUTES_PASS=Workshop_LostLimb / 16 tools, three patients, return portal
+EXPANDED_FLOOR=Trail_Frostbite / reachable extension 271.75 square metres
+PATIENT_MARKS_PASS=Trail_Frostbite / eight verified marks per patient
+LOCATION_ROUTES_PASS=Trail_Frostbite / 14 tools, three patients, return portal
+PRACTICE_ASSERTIONS_PASSED=3333
+PRACTICE_RUNTIME_SMOKE=PASS
+Passing Play Mode regression checks: 207
+
+Encounter checks
+ROUTINE PASS Loaded routine 0 visit 0
+ROUTINE PASS Five shared shirt palettes in this crowd: ShirtSage, CharacterPalette, ShirtOchre, ShirtIndigo, ShirtPlum
+ROUTINE PASS Twelve or more visible team characters including the three assessable patients
+ROUTINE PASS Emergency search area on entry 0: extension
+PLAYER_CROSSING_PASS=Cafe_Anaphylaxis / 60 half-metre steps
+ROUTINE PASS Local bystander gives ordinary findings
+ROUTINE PASS Distant inspection cannot reveal or select the patient
+ROUTINE PASS Turning away prevents reading unseen symptoms from the panel
+ROUTINE PASS Treated and stabilized 0
+ROUTINE PASS Loaded routine 0 visit 1
+ROUTINE PASS Five shared shirt palettes in this crowd: CharacterPalette, ShirtPlum, ShirtIndigo, ShirtSage, ShirtOchre
+ROUTINE PASS Twelve or more visible team characters including the three assessable patients
+ROUTINE PASS Emergency search area on entry 1: original venue
+ROUTINE PASS Local bystander gives ordinary findings
+ROUTINE PASS Distant inspection cannot reveal or select the patient
+ROUTINE PASS Turning away prevents reading unseen symptoms from the panel
+ROUTINE PASS Treated and stabilized 0
+ROUTINE PASS Loaded routine 0 visit 2
+ROUTINE PASS Five shared shirt palettes in this crowd: ShirtOchre, ShirtIndigo, ShirtPlum, ShirtSage, CharacterPalette
+ROUTINE PASS Twelve or more visible team characters including the three assessable patients
+ROUTINE PASS Emergency search area on entry 2: original venue
+ROUTINE PASS Loaded routine 1 visit 0
+ROUTINE PASS Five shared shirt palettes in this crowd: ShirtOchre, CharacterPalette, ShirtSage, ShirtIndigo, ShirtPlum
+ROUTINE PASS Twelve or more visible team characters including the three assessable patients
+ROUTINE PASS Emergency search area on entry 0: original venue
+PLAYER_CROSSING_PASS=Dining_ObstructedAirways / 60 half-metre steps
+ROUTINE PASS Local bystander gives ordinary findings
+ROUTINE PASS Distant inspection cannot reveal or select the patient
+ROUTINE PASS Turning away prevents reading unseen symptoms from the panel
+ROUTINE PASS Treated and stabilized 1
+ROUTINE PASS Loaded routine 1 visit 1
+ROUTINE PASS Five shared shirt palettes in this crowd: CharacterPalette, ShirtSage, ShirtOchre, ShirtPlum, ShirtIndigo
+ROUTINE PASS Twelve or more visible team characters including the three assessable patients
+ROUTINE PASS Emergency search area on entry 1: extension
+ROUTINE PASS Local bystander gives ordinary findings
+ROUTINE PASS Distant inspection cannot reveal or select the patient
+ROUTINE PASS Turning away prevents reading unseen symptoms from the panel
+ROUTINE PASS Treated and stabilized 1
+ROUTINE PASS Loaded routine 2 visit 0
+ROUTINE PASS Five shared shirt palettes in this crowd: ShirtPlum, ShirtIndigo, ShirtOchre, ShirtSage, CharacterPalette
+ROUTINE PASS Twelve or more visible team characters including the three assessable patients
+ROUTINE PASS Emergency search area on entry 0: extension
+PLAYER_CROSSING_PASS=Road_Hemorrhaging / 60 half-metre steps
+ROUTINE PASS Local bystander gives ordinary findings
+ROUTINE PASS Distant inspection cannot reveal or select the patient
+ROUTINE PASS Turning away prevents reading unseen symptoms from the panel
+ROUTINE PASS Treated and stabilized 2
+ROUTINE PASS Loaded routine 2 visit 1
+ROUTINE PASS Five shared shirt palettes in this crowd: ShirtOchre, ShirtPlum, ShirtSage, ShirtIndigo, CharacterPalette
+ROUTINE PASS Twelve or more visible team characters including the three assessable patients
+ROUTINE PASS Emergency search area on entry 1: original venue
+ROUTINE PASS Local bystander gives ordinary findings
+ROUTINE PASS Distant inspection cannot reveal or select the patient
+ROUTINE PASS Turning away prevents reading unseen symptoms from the panel
+ROUTINE PASS Treated and stabilized 2
+ROUTINE PASS Loaded routine 3 visit 0
+ROUTINE PASS Five shared shirt palettes in this crowd: ShirtOchre, ShirtIndigo, CharacterPalette, ShirtPlum, ShirtSage
+ROUTINE PASS Twelve or more visible team characters including the three assessable patients
+ROUTINE PASS Emergency search area on entry 0: extension
+PLAYER_CROSSING_PASS=Workshop_LostLimb / 60 half-metre steps
+ROUTINE PASS Local bystander gives ordinary findings
+ROUTINE PASS Distant inspection cannot reveal or select the patient
+ROUTINE PASS Turning away prevents reading unseen symptoms from the panel
+ROUTINE PASS Treated and stabilized 3
+ROUTINE PASS Loaded routine 3 visit 1
+ROUTINE PASS Five shared shirt palettes in this crowd: ShirtIndigo, ShirtOchre, ShirtPlum, ShirtSage, CharacterPalette
+ROUTINE PASS Twelve or more visible team characters including the three assessable patients
+ROUTINE PASS Emergency search area on entry 1: original venue
+ROUTINE PASS Local bystander gives ordinary findings
+ROUTINE PASS Distant inspection cannot reveal or select the patient
+ROUTINE PASS Turning away prevents reading unseen symptoms from the panel
+ROUTINE PASS Treated and stabilized 3
+ROUTINE PASS Loaded routine 4 visit 0
+ROUTINE PASS Five shared shirt palettes in this crowd: ShirtSage, CharacterPalette, ShirtIndigo, ShirtPlum, ShirtOchre
+ROUTINE PASS Twelve or more visible team characters including the three assessable patients
+ROUTINE PASS Emergency search area on entry 0: original venue
+PLAYER_CROSSING_PASS=Trail_Frostbite / 60 half-metre steps
+ROUTINE PASS Local bystander gives ordinary findings
+ROUTINE PASS Distant inspection cannot reveal or select the patient
+ROUTINE PASS Turning away prevents reading unseen symptoms from the panel
+ROUTINE PASS Treated and stabilized 4
+ROUTINE PASS Loaded routine 4 visit 1
+ROUTINE PASS Five shared shirt palettes in this crowd: ShirtPlum, ShirtIndigo, CharacterPalette, ShirtOchre, ShirtSage
+ROUTINE PASS Twelve or more visible team characters including the three assessable patients
+ROUTINE PASS Emergency search area on entry 1: extension
+ROUTINE PASS Local bystander gives ordinary findings
+ROUTINE PASS Distant inspection cannot reveal or select the patient
+ROUTINE PASS Turning away prevents reading unseen symptoms from the panel
+ROUTINE PASS Treated and stabilized 4
+PULSE_ROUTINES_PASS
+Windows build succeeded. 198 file hashes matched the delivered copy, including all seven enabled scenes.

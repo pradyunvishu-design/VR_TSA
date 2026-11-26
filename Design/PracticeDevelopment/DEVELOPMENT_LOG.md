@@ -122,3 +122,9 @@ The café pilot exercises a customer walking to the counter, reaching for a cup 
 Training waits until the learner sees the patient and silent ROOK can prompt the learner to look around. Certification can begin with an incident sound from the patient's location. Muted certification uses the visibility check. Treatment time starts at onset. Workshop injury geometry and alpine hand cues are fitted to both adult characters.
 
 The Windows Unity Play Mode tests exercised real scene transitions, walking, prop collection, alternating visible meshes, treatment with equipment, scoring, recovery, local cues and the muted run. After an alpine crossing failed in Play Mode, pedestrian departures were spaced using predicted routes. A geometry sweep of 480 assignments found 0.99 m minimum separation between the two walking adults. Static scene tests also verified the response-equipment approaches, return portals and the open sky above the trail. [Play Mode captures and verification](ScenarioRoutines/README.md)
+
+## November 26, 2026 — Expanded public areas and crowd assessment
+
+Added walkable public areas to all five scenario maps, distributed twelve team characters in each, and furnished each setting around its daily activities. The indoor scenarios remain enclosed and the ridge trail is open to the sky. Players begin in the extension and can reach the original setting on foot. Both areas have stocked response carts. Adults alternate as the priority patient, and a four-visit location cycle gives each eligible adult incidents on both sides. Healthy people can be checked through desktop and VR world interactions. Clinical identification requires proximity and direct sight. Spatial heartbeat and breathing follow the selected patient.
+
+[Ten Play Mode captures, scene details and verification results](ExpandedVenues/README.md)

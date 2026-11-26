@@ -68,6 +68,8 @@ namespace First180.Practice.Editor
                     FitTrayLabel(sign, art.transform.Find("Response cart"));
                 sign.GetComponent<MeshRenderer>().sharedMaterial = lettering;
             }
+            ExpandedVenueBuilder.AddResponseStation(room, art.transform);
+            labels = scene.GetRootGameObjects().SelectMany(o => o.GetComponentsInChildren<TextMesh>(true)).ToArray();
             var binder = room.GetComponent<WorldSignAtlas>();
             if (!binder) binder = room.gameObject.AddComponent<WorldSignAtlas>();
             binder.signs = labels;

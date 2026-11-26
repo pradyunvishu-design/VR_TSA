@@ -94,6 +94,7 @@ namespace First180.Practice.Editor
             {
                 string firstPerson = null;
                 string firstMesh = null;
+                bool? previousWing = null;
                 for (int visit = 0; visit < (id == 0 ? 3 : 2); visit++)
                 {
                     bool training = visit == 0;
@@ -113,6 +114,30 @@ namespace First180.Practice.Editor
                     var lead = room.patients[0];
                     var peer = room.patients[id == 1 || id == 2 ? 1 : 2];
                     var eye = Camera.main;
+                    var bystanders = Object.FindObjectsByType<CrowdBystander>(FindObjectsSortMode.None);
+                    Texture Shirt(Component person)
+                    {
+                        var skin = person.GetComponentsInChildren<SkinnedMeshRenderer>().First(s => s.enabled && s.sharedMesh);
+                        var properties = new MaterialPropertyBlock();
+                        skin.GetPropertyBlock(properties);
+                        return properties.GetTexture("_MainTex") ?? skin.sharedMaterial.mainTexture;
+                    }
+                    var worn = bystanders.Select(w => Shirt(w)).Concat(room.patients.Select(p => Shirt(p))).Distinct().ToArray();
+                    Check(worn.Length == 5 && worn.All(t => t), "Five shared shirt palettes in this crowd: " +
+                        string.Join(", ",worn.Select(t=>t ? t.name : "none")));
+                    Check(bystanders.Length == routine.WitnessCount && bystanders.Length + room.patients.Length >= 12 &&
+                        bystanders.All(w => w.GetComponentsInChildren<SkinnedMeshRenderer>().Any(s => s.enabled && s.sharedMesh)),
+                        "Twelve or more visible team characters including the three assessable patients");
+                    Check(bystanders.Count(w => w.transform.position.z < -11f) >= 5 &&
+                        bystanders.Count(w => w.transform.position.z > -9f) >= 2, "Crowd covers both map areas");
+                    bool wing = routine.TreatmentMark.z < -11f;
+                    Check(visit != 1 || previousWing != wing, "Emergency search area on entry " + visit + ": " + (wing ? "extension" : "original venue"));
+                    previousWing = wing;
+                    if (training)
+                    {
+                        EnvironmentRouteChecks.WalkAcrossVenue(Object.FindFirstObjectByType<PracticePlayer>());
+                        Capture(output, id + "-arrival", eye, null, 0f, default, eye.transform.position, eye.transform.forward);
+                    }
                     var cast = lead.GetComponent<CasePatientAnimation>();
                     string person = cast.ActiveAppearance;
                     Check(!string.IsNullOrEmpty(person) && (visit != 1 || firstPerson != person), "Eligible adult " + person);
@@ -154,9 +179,9 @@ namespace First180.Practice.Editor
                         previousFeet = lead.transform.position;
                         yield return null;
                     }
-                    Check(routine.WitnessCount == 2 && routine.LeadDistanceTravelled > .6f && routine.HasCollectedProp &&
+                    Check(routine.WitnessCount >= 9 && routine.LeadDistanceTravelled > .6f && routine.HasCollectedProp &&
                         routine.PeerHasCollectedProp && routine.PeerDistanceTravelled > .6f,
-                        "Both eligible adults walked and collected props with two witnesses in " + id);
+                        "Both eligible adults walked and collected props in the populated scene " + id);
                     if (id == 2) Check(trolley && trolley.Find("Parcel for loading") && trolleyTravel > .6f,
                         "Dispatcher wheeled a loaded trolley along the service lane");
                     Check(Vector3.Distance(lead.transform.position, routine.TreatmentMark) < .04f,
@@ -208,13 +233,33 @@ namespace First180.Practice.Editor
                     }
                     eye.transform.position = eyeStart;
                     if (visit == 2) continue;
+                    var healthy = bystanders.First(w => w.transform.position.z < -11f);
+                    PracticeSpatialQa.Approach(healthy.transform);
+                    var aim = healthy.GetComponent<CapsuleCollider>().bounds.center - eye.transform.position;
+                    Check(Physics.Raycast(eye.transform.position, aim.normalized, out var personHit, 3f, ~0, QueryTriggerInteraction.Collide)
+                        && personHit.collider.GetComponentInParent<CrowdBystander>() == healthy, "World ray hits the bystander's inspection collider");
+                    PracticeSpatialQa.TriggerInspect(personHit);
+                    Check(room.inspected == -1 && room.observation == healthy.Observation, "Local bystander gives ordinary findings");
+                    eye.transform.position = lead.transform.position + Vector3.up * 1.6f + Vector3.back * 9f;
                     room.Inspect(0);
+                    room.ChoosePatient(0);
+                    Check(room.inspected == -1 && room.encounter.SelectedPatient < 0, "Distant inspection cannot reveal or select the patient");
+                    PracticeSpatialQa.Approach(lead.transform);
+                    eye.transform.Rotate(0,180f,0);
+                    room.Inspect(0);
+                    Check(room.inspected == -1, "Turning away prevents reading unseen symptoms from the panel");
+                    PracticeSpatialQa.Approach(lead.transform);
+                    room.Inspect(0);
+                    Check(room.inspected == 0 && room.observation == room.Definition.symptoms, "On-site observation identifies the patient's signs");
                     room.ChoosePatient(0);
                     room.Diagnose(id);
                     var care = room.GetComponent<TreatmentManager>();
                     foreach (var action in room.Definition.actions)
                     {
-                        var tool = Object.FindObjectsByType<TreatmentTool>(FindObjectsSortMode.None).First(t => t.actionId == action);
+                        var tool = Object.FindObjectsByType<TreatmentTool>(FindObjectsSortMode.None).Where(t => t.actionId == action)
+                            .OrderBy(t => (t.transform.position - routine.TreatmentMark).sqrMagnitude).First();
+                        if (wing) Check(Vector3.Distance(tool.transform.position, routine.TreatmentMark) < 11f,
+                            "Local response cart stocks " + action);
                         var target = Object.FindObjectsByType<TreatmentTarget>(FindObjectsSortMode.None).FirstOrDefault(t => t.patientId == 0 && t.Accepts(action));
                         Check(target || action == "call", "Reachable clinical handler " + action);
                         care.Grab(tool, eye.transform);
@@ -267,11 +312,12 @@ namespace First180.Practice.Editor
             return subject + Vector3.back * distance + Vector3.up * .45f;
         }
 
-        static void Capture(string directory, string name, Camera eye, Transform lead, float distance, Vector3 travel = default)
+        static void Capture(string directory, string name, Camera eye, Transform lead, float distance, Vector3 travel = default,
+            Vector3? vantage = null, Vector3? facing = null)
         {
             if (string.IsNullOrEmpty(directory)) return;
             Directory.CreateDirectory(directory);
-            var subject = lead.position + Vector3.up * 1.05f;
+            var subject = lead ? lead.position + Vector3.up * 1.05f : eye.transform.position + eye.transform.forward;
             var go = new GameObject("Documentation camera");
             var camera = go.AddComponent<Camera>();
             var texture = RenderTexture.GetTemporary(960, 540, 24);
@@ -285,8 +331,8 @@ namespace First180.Practice.Editor
                 camera.fieldOfView = 54f;
                 camera.aspect = 16f / 9;
                 Vector3 front = travel.sqrMagnitude > .00001f ? travel.normalized : Vector3.back;
-                Vector3 position = FramePosition(subject, lead, distance, front);
-                camera.transform.SetPositionAndRotation(position, Quaternion.LookRotation(subject - position));
+                Vector3 position = vantage ?? FramePosition(subject, lead, distance, front);
+                camera.transform.SetPositionAndRotation(position, Quaternion.LookRotation(facing ?? (subject - position)));
                 camera.targetTexture = texture;
                 camera.Render();
                 RenderTexture.active = texture;

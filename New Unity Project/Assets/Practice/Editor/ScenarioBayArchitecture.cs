@@ -32,6 +32,8 @@ namespace First180.Practice.Editor
             if (room.scenarioId != AlpineTrail)
                 new Bay(room.scenarioId, art).Construct();
 
+            ExpandedVenueBuilder.Apply(room, art);
+
             // TextMesh atlases may be rebuilt on device. Include these signs in the existing room binder
             // even when only the enclosure is updated, independently of the larger environment art pass.
             var binder = room.GetComponent<WorldSignAtlas>();
@@ -62,7 +64,7 @@ namespace First180.Practice.Editor
                 var face = root.Find(faces[i]);
                 if (!face || !face.TryGetComponent(out BoxCollider boundary) || boundary.isTrigger ||
                     !face.TryGetComponent(out MeshRenderer surface) || !surface.enabled || !surface.sharedMaterial ||
-                    !boundary.Raycast(new Ray(origin, directions[i]), out _, 22f))
+                    !boundary.Raycast(new Ray(origin, directions[i]), out _, 32f))
                     throw new InvalidOperationException("Missing solid " + faces[i] + " face in " + room.name);
             }
             var wordmark = root.Find("Equipment identification/PULSE");

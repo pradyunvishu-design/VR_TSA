@@ -46,7 +46,8 @@ namespace First180.Practice
             session.StartTraining(0);yield return LoadFinished();
             var wrongRoom=FindFirstObjectByType<PracticeRoom>();
             PracticeSpatialQa.CheckCase(wrongRoom,Check);
-            wrongRoom.BeginEmergency();wrongRoom.ChoosePatient(0);wrongRoom.Diagnose(0);
+            wrongRoom.BeginEmergency();PracticeSpatialQa.Approach(wrongRoom.patients[0].transform);
+            wrongRoom.Inspect(0);wrongRoom.ChoosePatient(0);wrongRoom.Diagnose(0);
             wrongRoom.Inspect(2);
             Check(wrongRoom.inspected==0 && wrongRoom.observation==wrongRoom.Definition.symptoms,"Bystander inspection cannot replace selected patient findings during care");
             var wrongCare=wrongRoom.GetComponent<TreatmentManager>();
@@ -148,7 +149,7 @@ namespace First180.Practice
                 yield return LoadFinished();
                 var exam=FindFirstObjectByType<PracticeRoom>();
                 exam.BeginEmergency();
-                if(round==0) { exam.ChoosePatient(1);exam.Diagnose((exam.scenarioId+1)%5); }
+                if(round==0) { PracticeSpatialQa.Approach(exam.patients[1].transform);exam.Inspect(1);exam.ChoosePatient(1);exam.Diagnose((exam.scenarioId+1)%5); }
                 exam.elapsed=exam.Definition.timeLimit;
                 yield return null;yield return null;
                 Check(exam.result!=null && exam.result.timedOut && !exam.result.completed,"Certification timeout records an incomplete case "+round);
@@ -265,7 +266,7 @@ namespace First180.Practice
         IEnumerator CompleteCase(int id)
         {
             var room=FindFirstObjectByType<PracticeRoom>();Check(room!=null && room.scenarioId==id,"Scene loaded "+id);if(!room)yield break;
-            room.BeginEmergency();room.Inspect(0);room.ChoosePatient(0);room.Diagnose(id);
+            room.BeginEmergency();PracticeSpatialQa.Approach(room.patients[0].transform);room.Inspect(0);room.ChoosePatient(0);room.Diagnose(id);
             var care=room.GetComponent<TreatmentManager>();var hand=Camera.main.transform;
             foreach(string action in room.Definition.actions)
             {

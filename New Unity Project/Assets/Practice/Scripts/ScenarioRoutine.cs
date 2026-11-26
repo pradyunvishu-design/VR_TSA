@@ -4,19 +4,21 @@ using UnityEngine;
 namespace First180.Practice
 {
     [DefaultExecutionOrder(300)]
-    public sealed class ScenarioRoutine : MonoBehaviour
+    public sealed partial class ScenarioRoutine : MonoBehaviour
     {
         PracticeRoom room;
         Errand lead, peer;
         Witness[] witnesses;
         bool forCare;
         Transform viewer;
+        Transform publicCast;
         public bool ReadyForIncident => lead != null && peer != null && lead.Ready && peer.Ready;
         public bool HasCollectedProp => lead != null && lead.Collected;
         public bool PeerHasCollectedProp => peer != null && peer.Collected;
         public int WitnessCount => witnesses == null ? 0 : witnesses.Length;
         public float LeadDistanceTravelled => lead == null ? 0f : lead.walker.Distance;
         public float PeerDistanceTravelled => peer == null ? 0f : peer.walker.Distance;
+        public Transform GetWitnessTransform(int index) => witnesses[index].walker.Actor;
         public Transform Lead => room.patients[0].transform;
         public Transform ActiveProp => lead?.prop;
         public Vector3 TreatmentMark => lead == null ? Vector3.zero : lead.mark;
@@ -40,6 +42,8 @@ namespace First180.Practice
         void ConfigureVenue(Animator rig)
         {
             viewer = Camera.main ? Camera.main.transform : null;
+            publicCast = new GameObject("People in the venue").transform;
+            publicCast.SetParent(transform, false);
             var art = Resources.Load<RoutineProps>("RoutineProps");
             Animator adult = null, child = null;
             foreach (var patient in room.patients)
@@ -109,6 +113,7 @@ namespace First180.Practice
                     otherItem = new Vector3(-6.85f,.976f,-.42f); otherAisle = Floor(-6.78f,-1.49f); break;
             }
             var stations = new RoutineStations(transform, art);
+            SetUpPublicArea(stations, art, rig, adult, child, alternateChild);
             if (room.scenarioId == 2)
                 witnesses[0].trolley = stations.DispatchTrolley(witnesses[0].first);
             var firstProp = stations.Create(room.scenarioId, counterProp);
@@ -117,13 +122,16 @@ namespace First180.Practice
             bool clinicalAtFirstStation = Random.value < .5f;
             var first = clinicalAtFirstStation ? Lead : adultPatient;
             var second = clinicalAtFirstStation ? adultPatient : Lead;
-            var firstErrand = Prepare(first, clinicalAtFirstStation ? rig : adult, pickup, counterProp, firstProp, aisle, -1.62f);
-            var secondErrand = Prepare(second, clinicalAtFirstStation ? adult : rig, otherPickup, otherItem, secondProp, otherAisle, room.scenarioId == 1 ? .72f : .30f);
-            firstErrand.StartAt(start);
-            secondErrand.StartAt(otherStart);
+            Vector3 wingCounter = stations.PublicCounter(room.scenarioId);
+            var firstErrand = Prepare(first, clinicalAtFirstStation ? rig : adult, start, pickup, counterProp, firstProp, aisle, -1.62f, wingCounter);
+            var secondErrand = Prepare(second, clinicalAtFirstStation ? adult : rig, otherStart, otherPickup, otherItem, secondProp, otherAisle,
+                room.scenarioId == 1 ? .72f : .30f, wingCounter);
+            firstErrand.Start();
+            secondErrand.Start();
             SpaceCrossingPaths(firstErrand, secondErrand);
             lead = clinicalAtFirstStation ? firstErrand : secondErrand;
             peer = clinicalAtFirstStation ? secondErrand : firstErrand;
+            DressCast(art);
         }
 
         // Give crossing pedestrians a natural head start when their randomized assignments
@@ -158,13 +166,29 @@ namespace First180.Practice
             second.startDelay = bestSecond * sampleSeconds;
         }
 
-        Errand Prepare(Transform actor, Animator rig, Vector3 pickup, Vector3 item, Transform prop, Vector3 aisle, float lane)
+        Errand Prepare(Transform actor, Animator rig, Vector3 start, Vector3 pickup, Vector3 item, Transform prop,
+            Vector3 aisle, float lane, Vector3 wingCounter)
         {
-            return new Errand {
+            float halfHeight = item.y - prop.GetComponentInChildren<MeshRenderer>().bounds.min.y;
+            Vector3[] path;
+            if (actor.position.z < -11f)
+            {
+                start = Floor(-6.6f,-13.4f);
+                pickup = Floor(-7.14f,-16.17f);
+                item = wingCounter + Vector3.up * halfHeight;
+                prop.position = item;
+                // Take the west aisle around the island; the final turn reaches either discovery spot.
+                path = new[] { Floor(-5.0f,-16.17f), Floor(-5.0f,actor.position.z), actor.position };
+            }
+            else path = Approach(actor, pickup, aisle, lane);
+            var errand = new Errand {
                 actor = actor, walker = new RoutineWalker(actor, rig), mark = actor.position, pickup = pickup, item = item, prop = prop,
-                path = Approach(actor, pickup, aisle, lane), halfHeight = item.y - prop.GetComponentInChildren<MeshRenderer>().bounds.min.y,
+                path = path, halfHeight = halfHeight,
                 support = room.scenarioId == 1 || room.scenarioId == 2 || room.scenarioId == 4
             };
+            // Both routes must be planned while the two adults still occupy their care marks.
+            errand.SetStart(start);
+            return errand;
         }
 
         // Stay in the open cross aisle until aligned with the reserved triage spot.
@@ -203,27 +227,32 @@ namespace First180.Practice
         sealed class Witness
         {
             public RoutineWalker walker;
-            public Transform trolley;
+            public Transform trolley, carried;
             public bool fittedTrolley;
             public Vector3 first, second;
             public float speed, dwell, remaining;
             public bool turn;
+            public bool chatting, noticed;
+            public float poseCountdown, gesturePhase;
         }
 
-        Witness AddWitness(GameObject model, Quaternion facing, Material outfit, string name, Vector3 from, Vector3 to, float speed, float dwell)
+        Witness AddWitness(GameObject model, Quaternion facing, Material outfit, string name, Vector3 from, Vector3 to,
+            float speed, float dwell, string observation = "They turn when you speak and respond clearly.")
         {
             var actor = new GameObject(name).transform;
-            actor.SetParent(transform, true);
+            actor.SetParent(publicCast, true);
             actor.position = from;
             var copy = Instantiate(model, actor, false);
             copy.transform.localRotation = facing;
             if (outfit)
                 foreach (var skin in copy.GetComponentsInChildren<SkinnedMeshRenderer>()) skin.sharedMaterial = outfit;
             var clone = copy.GetComponent<Animator>();
-            // No controller, clinical script, target, or collider is attached to the scenic people.
+            // Background people share the team's rigs and can be examined separately from the scored patients.
             clone.enabled = false;
             var walker = new RoutineWalker(actor, clone);
-            walker.Face(to - from, 1f);
+            if (from != to) walker.Face(to - from, 1f);
+            var bystander = actor.gameObject.AddComponent<CrowdBystander>();
+            bystander.Configure(observation, walker.Height);
             return new Witness { walker = walker, first = from, second = to, speed = speed, dwell = dwell };
         }
 
@@ -242,9 +271,10 @@ namespace First180.Practice
             public bool Ready { get; private set; }
             public bool Collected { get; private set; }
 
-            public void StartAt(Vector3 start)
+            public void SetStart(Vector3 start) => this.start = start;
+
+            public void Start()
             {
-                this.start = start;
                 actor.position = start;
                 walker.Face(pickup - start, 1f);
                 Duration = Vector3.Distance(start, pickup) / 1.16f + 1.10f;
@@ -330,7 +360,6 @@ namespace First180.Practice
         {
             if (lead == null || peer == null) return;
             if (!forCare) { lead.walker.Restore(); peer.walker.Restore(); }
-            foreach (var witness in witnesses) witness?.walker.Restore();
             if (room.Paused || room.result != null) return;
             Advance(Time.deltaTime);
         }
@@ -352,11 +381,12 @@ namespace First180.Practice
             foreach (var witness in witnesses)
             {
                 if (witness == null) continue;
-                if (forCare)
+                if (witness.noticed)
                 {
                     witness.walker.Rest(dt);
                     witness.walker.Face(Lead.position - witness.walker.Position, dt);
                 }
+                else if (witness.first == witness.second) witness.walker.Rest(dt);
                 else if (witness.remaining > 0f)
                 {
                     witness.remaining -= dt;
@@ -365,7 +395,7 @@ namespace First180.Practice
                 else
                 {
                     Vector3 goal = witness.turn ? witness.first : witness.second;
-                    if (NeedsSpace(witness.walker.Position, goal)) witness.walker.Rest(dt);
+                    if (NeedsSpace(witness, goal)) witness.walker.Rest(dt);
                     else if (witness.walker.Walk(goal, witness.speed, dt))
                     {
                         witness.turn = !witness.turn;
@@ -375,8 +405,9 @@ namespace First180.Practice
             }
         }
 
-        bool NeedsSpace(Vector3 feet, Vector3 goal)
+        bool NeedsSpace(Witness witness, Vector3 goal)
         {
+            Vector3 feet = witness.walker.Position;
             Vector3 direction = (goal - feet).normalized;
             bool InFront(Vector3 position)
             {
@@ -384,17 +415,31 @@ namespace First180.Practice
                 offset.y = 0;
                 return offset.sqrMagnitude < 1.05f && Vector3.Dot(offset, direction) > .04f;
             }
-            return (viewer && InFront(viewer.position)) || InFront(lead.walker.Position) || InFront(peer.walker.Position);
+            if ((viewer && InFront(viewer.position)) || InFront(lead.walker.Position) || InFront(peer.walker.Position)) return true;
+            foreach (var patient in room.patients)
+                if (InFront(patient.transform.position)) return true;
+            foreach (var other in witnesses)
+                if (other != witness && InFront(other.walker.Position)) return true;
+            return false;
         }
 
         void LateUpdate()
         {
-            if (lead == null || peer == null) return;
+            if (lead == null || peer == null || room.Paused || room.result != null) return;
             if (!forCare) { lead.Pose(); peer.Pose(); }
             foreach (var witness in witnesses)
             {
-                bool pushing = witness.trolley && !forCare;
-                witness.walker.Pose(pushing, null, pushing);
+                // Distant people keep moving each frame; their smaller joint motions can update less often.
+                witness.poseCountdown -= Time.deltaTime;
+                if (witness.poseCountdown > 0f) continue;
+                bool far = viewer && (viewer.position - witness.walker.Position).sqrMagnitude > 14f * 14f;
+                witness.poseCountdown = far ? 1f / 24f : 0f;
+                bool pushing = witness.trolley && !witness.noticed;
+                bool twoHands = pushing || (witness.carried && (room.scenarioId == 1 || room.scenarioId == 2 || room.scenarioId == 4));
+                float gesture = witness.chatting && !witness.noticed
+                    ? Mathf.SmoothStep(0f, .9f, .5f + .5f * Mathf.Sin(Time.time * 1.68f + witness.gesturePhase)) : 0f;
+                witness.walker.Pose(pushing || witness.carried, null, twoHands, gesture);
+                if (witness.carried) witness.carried.position = witness.walker.GripCenter(twoHands);
                 if (!pushing) continue;
                 var grip = witness.walker.GripCenter(true);
                 witness.trolley.SetPositionAndRotation(new Vector3(grip.x, witness.walker.Position.y, grip.z),
@@ -414,6 +459,8 @@ namespace First180.Practice
             forCare = true;
             lead.Interrupt();
             peer.Interrupt();
+            foreach (var witness in witnesses)
+                witness.noticed = witness.trolley || (witness.walker.Position - Lead.position).sqrMagnitude < 5.5f * 5.5f;
             Physics.SyncTransforms();
         }
     }

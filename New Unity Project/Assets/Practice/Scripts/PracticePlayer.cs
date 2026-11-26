@@ -81,13 +81,20 @@ namespace First180.Practice
                     if(click || Input.GetKeyDown(KeyCode.E)) portal.Use();
                 }
                 var patient=hit.collider.GetComponentInParent<PracticePatient>();
+                var bystander=hit.collider.GetComponentInParent<CrowdBystander>();
+                if (bystander)
+                {
+                    clickedScenery=false;
+                    targetLabel=hit.distance <= 3.2f ? "E / click  Check person" : "Walk closer to check this person";
+                    if(click || Input.GetKeyDown(KeyCode.E)) room.InspectBystander(bystander);
+                }
                 if (button || portal || patient || hit.collider.GetComponentInParent<TreatmentTool>() || hit.collider.GetComponentInParent<TreatmentTarget>())
                     clickedScenery=false;
                 if(patient!=null)
                 {
                     if (care && care.held && hit.distance < 2.8f)
                         targetLabel = "Hold F  Use " + care.held.name;
-                    else targetLabel="E / click  Inspect patient";
+                    else targetLabel=hit.distance <= 3.2f ? "E / click  Check person" : "Walk closer to check this person";
                     if(click || Input.GetKeyDown(KeyCode.E)) room.Inspect(patient.patientId);
                 }
             }

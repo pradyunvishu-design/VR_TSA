@@ -159,7 +159,7 @@ namespace First180.Practice
             if(!EmergencyActive)
             {
                 Label(1173,120,375,31,"LOCATION BRIEF",panelCaption);
-                Label(1173,168,375,130,Definition.normal);
+                Label(1173,168,375,130,LocationBrief);
                 return;
             }
 
@@ -179,11 +179,13 @@ namespace First180.Practice
                 {
                     int patient=PatientInSlot(slot);
                     float y=259+slot*49;
+                    GUI.enabled=CanObserve(patients[patient].transform);
                     if(Button(1173,y,382,42,"Inspect patient "+patientLabels[patient])) Inspect(patient);
+                    GUI.enabled=true;
                     if(inspected==patient) Fill(new Rect(1173,y,4,42),accent);
                 }
                 Label(1173,419,375,30,"FINDINGS",panelCaption);
-                Label(1173,457,380,126,inspected<0?"Select a patient to record your observations.":observation);
+                Label(1173,457,380,126,SearchFindings);
                 GUI.enabled=inspected>=0;
                 if(Button(1173,604,382,54,inspected<0?"Choose a patient first":"Prioritize patient "+patientLabels[inspected])) ChoosePatient(inspected);
                 GUI.enabled=true;
@@ -220,7 +222,7 @@ namespace First180.Practice
             get
             {
                 int id=encounter.SelectedPatient>=0?encounter.SelectedPatient:inspected;
-                if(id<0) return "PATIENTS  /  3 ON SCENE";
+                if(id<0) return "SCENE ASSESSMENT";
                 return "PATIENT "+patientLabels[id]+(encounter.SelectedPatient>=0?"  /  SELECTED":"  /  INSPECTED");
             }
         }

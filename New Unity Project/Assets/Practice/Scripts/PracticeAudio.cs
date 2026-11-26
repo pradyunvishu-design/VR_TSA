@@ -13,14 +13,23 @@ namespace First180.Practice
         public Transform robot;
         void Awake()
         {
-            heart=gameObject.AddComponent<AudioSource>();
             ambience=gameObject.AddComponent<AudioSource>();
             effects=gameObject.AddComponent<AudioSource>();
-            breathing=gameObject.AddComponent<AudioSource>();breath=MakeBreath();breathing.clip=breath;breathing.loop=true;breathing.volume=0;breathing.Play();
             pulse=MakeTone("Heartbeat",0.36f,60,true);
             warning=MakeTone("Incident",0.8f,190,false);
             ping=MakeTone("Robot acknowledgment",0.15f,640,false);
             var room = GetComponent<PracticeRoom>();
+            if (room && room.scenarioId >= 0)
+            {
+                var patient = room.patients[0].transform;
+                heart = PatientSource("Patient heartbeat", patient, 1.05f, 14f);
+                breathing = PatientSource("Patient breathing", patient, 1.45f, 10f);
+                breath = MakeBreath();
+                breathing.clip = breath;
+                breathing.loop = true;
+                breathing.volume = 0f;
+                breathing.Play();
+            }
             if (room && room.scenarioId >= 0 && room.scenarioId < IncidentNames.Length)
                 incidentSound = MakeIncidentSound(room.scenarioId);
             if (room && room.scenarioId >= 0 && room.scenarioId < LocationLoops.Length)
@@ -42,25 +51,30 @@ namespace First180.Practice
                 breathing.volume=room.scenarioId==1 && state && !state.treated?.015f:.12f;
                 breathing.pitch=state && state.treated?.8f:1.25f;
             }
-            else breathing.volume=0;
+            else if(breathing) breathing.volume=0;
             ambience.volume=room && room.Paused?0:room && room.scenarioId==4?.28f:.07f;
         }
         public void SignalIncident(Transform patient)
         {
             // The first sound belongs to the scene. Both ears receive a cue from
             // the person's actual location, including when the player faces away.
-            var source = new GameObject("Incident sound").AddComponent<AudioSource>();
+            var source = PatientSource("Incident sound", patient, .85f, 48f);
+            source.clip = incidentSound;
+            source.volume = .85f;
+            source.Play();
+        }
+        static AudioSource PatientSource(string name, Transform patient, float height, float range)
+        {
+            var source = new GameObject(name).AddComponent<AudioSource>();
             source.transform.SetParent(patient, false);
-            source.transform.localPosition = Vector3.up * .85f;
+            source.transform.localPosition = Vector3.up * height;
             source.playOnAwake = false;
             source.spatialBlend = 1f;
             source.dopplerLevel = 0f;
             source.rolloffMode = AudioRolloffMode.Linear;
             source.minDistance = 3f;
-            source.maxDistance = 42f;
-            source.clip = incidentSound;
-            source.volume = .85f;
-            source.Play();
+            source.maxDistance = range;
+            return source;
         }
 
         static readonly string[] IncidentNames = {

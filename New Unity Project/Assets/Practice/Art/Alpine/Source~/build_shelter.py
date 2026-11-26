@@ -17,7 +17,7 @@ RNG = random.Random(1804)
 # sections batch by material. Separate meshes allow independent editing/culling.
 COLORS = {
     "ice":"bccfd7","snow":"e4e9e7","sunSnow":"f0eee4","shade":"a5bfca",
-    "trail":"c9d5d6","track":"aebfc3","deep":"688c9e","peak":"93a9b1","peakShade":"728b97",
+    "trail":"9faeb0","track":"839799","deep":"688c9e","peak":"93a9b1","peakShade":"728b97",
     "stone":"667b80","stoneLight":"85999d","stoneDark":"495c61","scree":"aebdc0",
     "spruce":"304f4c","pine":"46645c","blueSpruce":"57736b","pineShadow":"314742",
     "bark":"51473f","trunk":"746456","lumber":"ab7753","grain":"936546","honey":"c29167",
@@ -128,7 +128,8 @@ def terrain():
     for ix,x in enumerate(xs):
         for iz,z in enumerate(zs):
             xx=x+RNG.uniform(-.48,.48);zz=z+RNG.uniform(-.48,.48)
-            edge=max(abs(xx)-8,zz-8,-zz-6,0)
+            # Level the route all the way to the south overlook. Keep the drifts outside its ropes.
+            edge=max(abs(xx)-(11.5 if zz<-6 else 8),zz-8,-zz-28.5,0)
             h=-.025+min(1,edge/5)*(.23+.28*cos(xx*.36)+.18*sin(zz*.52)+.22*RNG.random())
             points[ix,iz]=(xx,h,zz)
     for i in range(len(xs)-1):
@@ -138,7 +139,9 @@ def terrain():
             mesh.face((a,b,d),col,(0,1,0));mesh.face((b,c,d),col,(0,1,0))
     # Shallow packed trail; the track branches at the waystone in front of the refuge.
     for path in [[(1,-9,1.8),(.2,-6,1.6),(-.6,-3.3,1.55),(-1.8,-1.4,1.55),(-3.3,.15,1.4),(-5,1.6,1.1)],
-                 [(-.4,-3,1.35),(1.5,-1.9,1.15),(3.8,-.3,1.2),(5.2,1.7,1),(6.3,3,1)]]:
+                 [(-.4,-3,1.35),(1.5,-1.9,1.15),(3.8,-.3,1.2),(5.2,1.7,1),(6.3,3,1)],
+                 [(1,-9,1.8),(-.5,-11,1.5),(-3.3,-14.8,1.25),(-4.7,-19.2,1.2),(-3,-22.3,1.1),(0,-24,1.1)],
+                 [(0,-24,1.1),(3.3,-21.5,1.2),(4.7,-17.2,1.2),(4.4,-14,1.15),(1,-9,1.55)]]:
         edges=[]
         for i,(x,z,w) in enumerate(path):
             a=path[max(0,i-1)];b=path[min(len(path)-1,i+1)]
@@ -173,7 +176,8 @@ def forest():
     mesh=Mesh()
     # Fixed groves leave sightlines open through the care area and hut door.
     seeds=[(8,5), (11,8), (13,1), (9,15), (3,13), (-4,13), (-12,10), (-14,1),
-           (-14,-7), (14,-8), (6,-16), (-6,-16), (0,20),(20,13),(-20,15)]
+           (-14,-7), (14,-8), (14,-17), (-14,-17), (0,20),(20,13),(-20,15),
+           (-10,-30),(2,-31),(12,-30),(-15,-24),(15,-24)]
     for j,(x,z) in enumerate(seeds):
         for i in range(4 if j<8 else 3):
             xx=x+RNG.uniform(-2.5,2.5); zz=z+RNG.uniform(-2.8,2.8)
@@ -183,6 +187,12 @@ def forest():
             place_kit(mesh,model,(xx,.04,zz),(tall*1.35,tall,tall*1.35),RNG.uniform(0,6))
     for (x,z,size) in [(-8.9,-1.6,1.2),(6.4,3,1),(5,6.4,1.8),(6,7.7,1.05),(9.1,.2,.85),(-9.4,7.1,1.4),(-8.4,8.9,1.6),(1.7,7.3,1.2),(3.4,10,1.6),(2.5,-8.4,.8)]:
         place_kit(mesh,"stone_largeA",(x,-.015,z),(size*1.7,size*1.8,size),RNG.uniform(0,6))
+    # Rock outcrops fringe the extended overlook outside the ropes. Leave the
+    # treatment lanes and the view of the shelter unobstructed.
+    for x,z,size in [(-11.45,-13.4,1.45),(-11.08,-14.85,.81),(-10.98,-20.55,1.16),
+                     (11.04,-12.55,.90),(11.55,-18.9,1.40),(11.22,-20.57,.85),
+                     (-5.65,-27.89,1.62),(-3.71,-27.51,.87),(7.69,-27.45,1.06)]:
+        place_kit(mesh,"stone_largeA",(x,-.05,z),(size*1.67,size*1.24,size),RNG.uniform(0,6))
     mesh.save("SnowlineForest")
 
 def shelter():

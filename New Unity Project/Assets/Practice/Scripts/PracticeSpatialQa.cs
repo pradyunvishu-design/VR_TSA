@@ -10,6 +10,19 @@ namespace First180.Practice
     // Uses the live board, room, tools and the same button/grip dispatch as the XR controllers.
     public static class PracticeSpatialQa
     {
+        public static void TriggerInspect(RaycastHit hit)
+        {
+            var rig = Object.FindFirstObjectByType<VRInteractionManager>();
+            rig.ApplyHand(1, rig.rightHand, hit.collider, hit.distance, true, true, false, false, false);
+        }
+        public static void Approach(Transform person)
+        {
+            var eye = Camera.main.transform;
+            Vector3 subject = person.position + Vector3.up * 1.2f;
+            eye.position = subject + new Vector3(0, .35f, -.95f);
+            eye.LookAt(subject);
+            Physics.SyncTransforms();
+        }
         public static void CheckCase(PracticeRoom room,Action<bool,string> check)
         {
             var rig=Object.FindFirstObjectByType<VRInteractionManager>();
@@ -43,7 +56,7 @@ namespace First180.Practice
                 check(!care.held,"Modal spatial input blocks world pickup for hand "+index);
             }
             room.BeginEmergency();
-            var audio=room.GetComponents<AudioSource>();
+            var audio=room.GetComponents<AudioSource>().Concat(room.patients[0].GetComponentsInChildren<AudioSource>()).ToArray();
             check(audio.Where(source=>source.clip).All(source=>
                     !UnityEditor.AssetDatabase.GetAssetPath(source.clip).Contains("/PracticeVoice/")),
                   "ROOK instruction dispatch does not assign a voice clip");
@@ -57,6 +70,8 @@ namespace First180.Practice
             for (int slot=0;slot<3;slot++)
             {
                 var inspect=Button(panel,"Inspect patient "+(char)('A'+slot));
+                Approach(room.patients[room.PatientInSlot(slot)].transform);
+                panel.RefreshPanel(true);
                 if(inspect) rig.ApplyHand(1,rig.rightHand,inspect.GetComponent<Collider>(),1,true,true,false,false,false);
                 check(inspect && room.inspected==room.PatientInSlot(slot) && prioritize && prioritize.Available,
                       "Spatial inspection selects the displayed A/B/C slot "+slot);

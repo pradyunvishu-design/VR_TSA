@@ -147,6 +147,7 @@ namespace First180.Practice
             var portal=hit.GetComponentInParent<PracticePortal>();
             if (portal && portal.CanSelect(hitDistance)) portal.Use();
             else if (hit.GetComponentInParent<PracticePatient>() is PracticePatient patient) room.Inspect(patient.patientId);
+            else if (hit.GetComponentInParent<CrowdBystander>() is CrowdBystander bystander) room.InspectBystander(bystander);
         }
     }
 }

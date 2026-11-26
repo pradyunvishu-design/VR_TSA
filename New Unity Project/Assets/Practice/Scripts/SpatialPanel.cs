@@ -18,6 +18,7 @@ namespace First180.Practice
         Texture2D pulseWordmark;
         Text body, patientIdentity;
         SpatialButton prioritize;
+        readonly SpatialButton[] inspectButtons = new SpatialButton[3];
         string stage = "";
         float nextRefresh;
         int page;
@@ -75,6 +76,9 @@ namespace First180.Practice
                 Build();
             }
             if (prioritize) prioritize.SetAvailable(room.inspected>=0);
+            if (stage=="triage")
+                for (int id=0; id<inspectButtons.Length; id++)
+                    inspectButtons[id].SetAvailable(room.CanObserve(room.patients[id].transform));
             if (patientIdentity) patientIdentity.text=room.PatientPanelIdentity;
             body.text=Body();
         }
@@ -167,7 +171,7 @@ namespace First180.Practice
                 for(int slot=0;slot<3;slot++)
                 {
                     int id=room.PatientInSlot(slot);
-                    Button("Inspect patient "+room.patientLabels[id],slot,()=>{room.Inspect(id);RefreshPanel(true);});
+                    inspectButtons[id]=Button("Inspect patient "+room.patientLabels[id],slot,()=>{room.Inspect(id);RefreshPanel(true);});
                 }
                 prioritize=Button("Prioritize inspected patient",3,()=>room.ChoosePatient(room.inspected),room.inspected>=0);
             }
@@ -210,9 +214,9 @@ namespace First180.Practice
             switch(stage)
             {
                 case "hub": return "Earn 100% in every scenario to unlock certification.\n\nWalk up to a scenario or point and press trigger. Left stick moves, right stick turns. Left X teleports. Right B recalls this panel.";
-                case "normal": return room.Definition.normal;
+                case "normal": return room.LocationBrief;
                 case "paused": return "Sound "+(session.muted?"off":"on")+"\nUse either trigger to select. Right B recalls this panel.";
-                case "triage": case "diagnose": return room.inspected>=0?"Findings\n"+room.observation:"Select a patient to record your observations.";
+                case "triage": case "diagnose": return room.SearchFindings;
                 case "care":
                     string detail=showingObservation?"Reassessment\n"+room.observation:session.certification
                         ?"Elapsed "+room.elapsed.ToString("0")+" s  /  Limit "+room.Definition.timeLimit+" s"

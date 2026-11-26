@@ -171,7 +171,6 @@ namespace First180.Practice
             if (room.EmergencyActive && !sawEmergency)
             {
                 sawEmergency = true;
-                if (patientMarker) patientMarker.gameObject.SetActive(true);
                 if (intact && injured)
                 {
                     intact.enabled = false;
@@ -181,6 +180,8 @@ namespace First180.Practice
             }
             if (sawEmergency && patientMarker && Camera.main)
             {
+                bool nearby = room.CanObserve(transform);
+                if (patientMarker.gameObject.activeSelf != nearby) patientMarker.gameObject.SetActive(nearby);
                 var away = patientMarker.position - Camera.main.transform.position;
                 away.y = 0f;
                 if (away.sqrMagnitude > .001f)

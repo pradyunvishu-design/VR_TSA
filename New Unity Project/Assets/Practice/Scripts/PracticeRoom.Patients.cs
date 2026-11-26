@@ -6,9 +6,16 @@ namespace First180.Practice
     {
         // Remember which eligible adult was seen last across visits in this play session.
         static readonly System.Collections.Generic.Dictionary<int, bool> lastCastSwap = new();
+        static readonly System.Collections.Generic.Dictionary<int, int> visitInAreaCycle = new();
+        static readonly System.Collections.Generic.Dictionary<int, bool> firstArea = new();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void ResetCastHistory() => lastCastSwap.Clear();
+        static void ResetCastHistory()
+        {
+            lastCastSwap.Clear();
+            visitInAreaCycle.Clear();
+            firstArea.Clear();
+        }
 
         void AssignPatientCast()
         {
@@ -39,6 +46,8 @@ namespace First180.Practice
 
         public Vector3 PatientMark(int slot, int variation)
         {
+            if (slot == 3)
+                return variation == 0 ? new Vector3(-3f, 0f, -15f) : new Vector3(3f, 0f, -21f);
             var mark = patientMarks[scenarioId, slot * 2 + variation];
             return new Vector3(mark.x, 0f, mark.y);
         }
@@ -54,11 +63,20 @@ namespace First180.Practice
                 (slots[i], slots[other]) = (slots[other], slots[i]);
             }
 
+            // Rotate the search area independently of the cast and the displayed A/B/C identifiers.
+            // The two distinct areas are both represented on every visit.
+            visitInAreaCycle.TryGetValue(scenarioId, out int visit);
+            if (visit == 0) firstArea[scenarioId] = Random.value < .5f;
+            // ABBA (or BAAB) lets both alternating adult identities play both areas in four visits.
+            bool extension = visit == 0 || visit == 3 ? firstArea[scenarioId] : !firstArea[scenarioId];
+            visitInAreaCycle[scenarioId] = (visit + 1) % 4;
+            int extensionPatient = extension ? 0 : Random.Range(1, patients.Length);
+            int firstLabel = Random.Range(0, 3);
             foreach (var patient in patients)
             {
                 int slot = slots[patient.patientId];
-                patient.transform.position = PatientMark(slot, Random.Range(0, 2));
-                string label = ((char)('A' + slot)).ToString();
+                patient.transform.position = PatientMark(patient.patientId == extensionPatient ? 3 : slot, Random.Range(0, 2));
+                string label = ((char)('A' + (slot + firstLabel) % 3)).ToString();
                 patientLabels[patient.patientId] = label;
                 var marker = patient.transform.Find("Patient marker");
                 if (marker && marker.TryGetComponent<TextMesh>(out var text)) text.text = "PATIENT " + label;

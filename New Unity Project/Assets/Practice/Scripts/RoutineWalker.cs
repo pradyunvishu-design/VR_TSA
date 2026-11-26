@@ -25,6 +25,8 @@ namespace First180.Practice
         public Vector3 Position => actor.position;
         public Vector3 Facing => actor.TransformDirection(facingInActor);
         public float Distance { get; private set; }
+        public Transform Actor => actor;
+        public float Height { get; }
 
         public RoutineWalker(Transform actor, Animator animator)
         {
@@ -42,7 +44,8 @@ namespace First180.Practice
                 if (offset.sqrMagnitude > .0001f) front = offset.normalized;
             }
             facingInActor = actor.InverseTransformDirection(front);
-            stride = bones.TryGetValue("Head", out var h) ? Mathf.Clamp((h.position.y - actor.position.y) * .82f, .72f, 1.42f) : 1.2f;
+            Height = bones.TryGetValue("Head", out var h) ? Mathf.Clamp(h.position.y - actor.position.y + .16f, 1.12f, 2f) : 1.65f;
+            stride = Mathf.Clamp((Height - .16f) * .82f, .72f, 1.42f);
         }
 
         public bool Walk(Vector3 destination, float speed, float dt)
@@ -93,7 +96,7 @@ namespace First180.Practice
             applied = false;
         }
 
-        public void Pose(bool carry, Vector3? reach = null, bool support = false)
+        public void Pose(bool carry, Vector3? reach = null, bool support = false, float gesture = 0f)
         {
             Restore();
             for (int i = 0; i < joints.Length; i++) if (joints[i]) before[i] = joints[i].localRotation;
@@ -108,8 +111,8 @@ namespace First180.Practice
             Rotate(Joint.LeftFoot, right, left * 9f);
             Rotate(Joint.RightFoot, right, rightSwing * 9f);
             Rotate(Joint.Chest, Vector3.up, left * 3.5f);
-            SetDirection(Joint.LeftArm, Joint.LeftForearm, Vector3.down - right * .18f - front * (.38f * left));
-            SetDirection(Joint.LeftForearm, Joint.LeftHand, Vector3.down + front * (.15f - .30f * left));
+            SetDirection(Joint.LeftArm, Joint.LeftForearm, Vector3.down - right * .18f + front * (gesture * .52f - .38f * left));
+            SetDirection(Joint.LeftForearm, Joint.LeftHand, Vector3.down * (1f - gesture) + front * (.15f + .95f * gesture - .30f * left));
             if (reach.HasValue && Hand)
             {
                 Reach(Joint.RightArm, Joint.RightForearm, Joint.RightHand, reach.Value, front, right);
