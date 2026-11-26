@@ -18,7 +18,7 @@ namespace First180.Practice
         public static readonly ScenarioDefinition[] All =
         {
             new ScenarioDefinition {
-                id=0, title="Anaphylaxis", location="Juniper Cafe", scene="Cafe_Anaphylaxis",
+                id=0, title="Anaphylaxis", location="Switchback Coffee", scene="Cafe_Anaphylaxis",
                 normal="A customer is enjoying lunch. The cafe is quiet.",
                 incident="A customer suddenly struggles to breathe after eating.",
                 symptoms="Swollen lips, hives and noisy breathing after a known allergen. The patient has a prescribed auto-injector.",
@@ -26,7 +26,7 @@ namespace First180.Practice
                 instructions=new[]{"Check the surroundings, introduce yourself and obtain consent.","Ask a bystander to call 911 and retrieve the patient's prescribed auto-injector.","Assist with the prescribed epinephrine device if trained, following its instructions. Use the outer mid-thigh for this simulated auto-injector.","Stay with the patient and reassess breathing and responsiveness until EMS takes over."}
             },
             new ScenarioDefinition {
-                id=1, title="Obstructed Airways", location="Commons Dining Hall", scene="Dining_ObstructedAirways",
+                id=1, title="Obstructed Airways", location="Relay Hall", scene="Dining_ObstructedAirways",
                 normal="Guests are talking over a meal in the dining hall.",
                 incident="A diner stands up, grabs their throat and cannot speak.",
                 symptoms="A responsive adult cannot speak, breathe or cough effectively after taking a bite. No allergy signs.",

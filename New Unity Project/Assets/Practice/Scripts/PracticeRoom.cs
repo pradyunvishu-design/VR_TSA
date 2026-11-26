@@ -15,16 +15,27 @@ namespace First180.Practice
         [System.NonSerialized] public CaseResult result;
         public float elapsed, calmTime;
         public bool Paused { get; private set; }
-        public void TogglePause(){Paused=!Paused;}
+        public void TogglePause()
+        {
+            resetConfirm=false;
+            Paused=!Paused;
+        }
         public bool EmergencyActive { get; private set; }
         ScenarioDefinition runtimeDefinition;
         public ScenarioDefinition Definition => scenarioId<0?null:runtimeDefinition??ScenarioCatalog.All[scenarioId];
         public string feedback="", observation="";
+        public int PatientInSlot(int slot)
+        {
+            // Labels follow physical positions when certification rotates the cast.
+            return System.Array.IndexOf(patientLabels, ((char)('A' + slot)).ToString());
+        }
+        string updatedObservation;
         public int inspected=-1;
         public bool showHelp=true;
         float actionCooldown;
         PracticeSession session;
         PracticeAudio audioSystem;
+        RookInstructor instructor;
         void Start()
         {
             result=null;
@@ -47,7 +58,12 @@ namespace First180.Practice
                     state.Initialize(this,p);state.deteriorationRate=session.certification?Random.Range(config?config.deteriorationPerSecond.x:.22f,config?config.deteriorationPerSecond.y:.38f):.08f;
                     if(session.certification && p.patientId==0)state.stability=Random.Range(75f,96f);
                 }
-                feedback="ROOK online. Observe the room.";
+                if (!session.certification)
+                {
+                    feedback = "Observe the room. I’ll guide you when someone needs help.";
+                    instructor = gameObject.AddComponent<RookInstructor>();
+                    instructor.Present(feedback);
+                }
                 if(patients!=null && patients.Length==3 && session.certification)
                 {
                     // Patient identities move between positions, so the severe case is not always centered.
@@ -62,7 +78,7 @@ namespace First180.Practice
         }
         void Update()
         {
-            if(Input.GetKeyDown(KeyCode.Escape)) Paused=!Paused;
+            if(Input.GetKeyDown(KeyCode.Escape)) TogglePause();
             if(scenarioId<0 || Paused || result!=null || session.loading) return;
             if(!EmergencyActive)
             {
@@ -79,28 +95,36 @@ namespace First180.Practice
             EmergencyActive=true;elapsed=0;
             if(incidentRoot) incidentRoot.SetActive(true);
             audioSystem.Alarm();
-            feedback="ROOK: Inspect the patients and choose who needs care first.";
-            audioSystem.Speak("intro");
+            feedback = session.certification ? "Incident active." : "ROOK: Inspect the patients and choose who needs care first.";
+            GiveInstruction("intro");
+        }
+        void GiveInstruction(string voiceKey)
+        {
+            if (!instructor || session.certification) return;
+            instructor.Present(feedback);
+            audioSystem.Speak(voiceKey);
         }
         public void Inspect(int id)
         {
             if(!EmergencyActive || result!=null || id<0 || id>2) return;
+            if(encounter.SelectedPatient>=0 && encounter.SelectedPatient!=id) return;
             inspected=id;
-            observation=id==0?Definition.symptoms:id==1?"Alert, speaking in full sentences. Small superficial hand scrape, no heavy bleeding.":"Walking and talking normally. Shaken by the incident but reports no injury.";
+            observation=id==0?(updatedObservation ?? Definition.symptoms):id==1?"Alert, speaking in full sentences. Small superficial hand scrape, no heavy bleeding.":"Walking and talking normally. Shaken by the incident but reports no injury.";
         }
         public void ChoosePatient(int id)
         {
             if(!EmergencyActive || result!=null || encounter.SelectedPatient>=0) return;
             bool correct=encounter.ChoosePatient(id,elapsed);
+            if(encounter.SelectedPatient>=0) Inspect(encounter.SelectedPatient);
             feedback=session.certification?"Patient selection recorded.":correct?"ROOK: Correct priority. Identify the main condition.":"ROOK: Breathing compromise or uncontrolled bleeding takes priority over minor injuries. Inspect again.";
-            if(!session.certification) audioSystem.Speak(correct?"diagnose":"priority_wrong");
+            if(!session.certification) GiveInstruction(correct?"diagnose":"priority_wrong");
         }
         public void Diagnose(int id)
         {
             if(!EmergencyActive || result!=null || encounter.SelectedPatient<0 || encounter.DiagnosedAs>=0) return;
             bool correct=encounter.Diagnose(id,elapsed);
             feedback=session.certification?"Assessment recorded.":correct?"ROOK: Correct. "+Definition.instructions[0]:"ROOK: Recheck the observed signs. That diagnosis does not fit this case.";
-            if(!session.certification) audioSystem.Speak(correct?"case"+scenarioId+"_0":"diagnosis_wrong");
+            if(!session.certification) GiveInstruction(correct?"case"+scenarioId+"_0":"diagnosis_wrong");
         }
         public void Perform(string action)
         {
@@ -113,11 +137,11 @@ namespace First180.Practice
             else if(correct)
             {
                 feedback="ROOK: Good. "+(encounter.Step<Definition.actions.Length?Definition.instructions[encounter.Step]:"Care sequence complete.");
-                audioSystem.Speak(encounter.Step<Definition.actions.Length?"case"+scenarioId+"_"+encounter.Step:"complete");
+                GiveInstruction(encounter.Step<Definition.actions.Length?"case"+scenarioId+"_"+encounter.Step:"complete");
             }
-            else { feedback="ROOK: "+ScenarioCatalog.WhyWrong(action)+" "+Definition.instructions[encounter.Step];audioSystem.Speak("wrong"); }
+            else { feedback="ROOK: "+ScenarioCatalog.WhyWrong(action)+" "+Definition.instructions[encounter.Step];GiveInstruction("wrong"); }
             if(correct && action=="shelter" && patients!=null) patients[0].transform.position=new Vector3(-5,.2f,3);
-            if(correct && earlyResponse && (action=="backblows" || action=="pressure")) observation=scenarioId==1?"The obstruction has cleared. The patient is breathing and speaking.":"Bleeding has stopped with maintained pressure. Continue monitoring.";
+            if(correct && earlyResponse && (action=="backblows" || action=="pressure")) observation=updatedObservation=scenarioId==1?"The obstruction has cleared. The patient is breathing and speaking.":"Bleeding has stopped with maintained pressure. Continue monitoring.";
             if(correct && action=="monitor" && patients!=null && patients[0].injuryVisual) patients[0].injuryVisual.SetActive(false);
             if(encounter.Step>=Definition.actions.Length) Complete();
         }
@@ -126,7 +150,7 @@ namespace First180.Practice
             if(encounter==null || result!=null || encounter.DiagnosedAs<0)return;
             encounter.PlacementError(action,elapsed);patients[0].GetComponent<PatientManager>().Apply(action,false);
             feedback=PracticeSession.Get().certification?"Action recorded.":"ROOK: Incorrect placement. Check the highlighted anatomical target and reposition the tool.";
-            audioSystem.Speak("wrong");
+            GiveInstruction("wrong");
         }
         public void Complete(bool timeout=false)
         {
@@ -135,12 +159,21 @@ namespace First180.Practice
             var patientState=patients[0].GetComponent<PatientManager>();
             result.patientStabilized=patientState.stabilized;result.patientWorsened=!patientState.stabilized && patientState.stability<70;
             audioSystem.Feedback(result.completed);
+            if (instructor)
+                instructor.Present(result.score == 100 ? "Care sequence complete. You mastered this scenario."
+                    : "Review your training score and retry the case to practice the missed steps.");
             session.Record(result);
         }
         public bool PointerOverUI(Vector3 point)
         {
-            float x=point.x/Screen.width*1600, y=(Screen.height-point.y)/Screen.height*900;
-            return Paused || session.dashboard || result!=null || x>1140 || y<85 || y>808;
+            if (Paused || result!=null || (session && (session.dashboard || session.loading))) return true;
+            var hudPoint=new Vector2((point.x-HudLeft)/HudScale,(Screen.height-point.y)/HudScale);
+            for(int i=0;i<drawnPanels.Count;i++) if(drawnPanels[i].Contains(hudPoint)) return true;
+            if (!instructor) return false;
+            var display=instructor.transform.Find("ROOK instructor display");
+            if(!display || !display.GetComponent<Canvas>().isActiveAndEnabled) return false;
+            var card=display.Find("Guidance") as RectTransform;
+            return card && RectTransformUtility.RectangleContainsScreenPoint(card,point);
         }
     }
 }

@@ -1,0 +1,20 @@
+FIRST180 practice build | Riverside Service Road and Fabrication Workshop
+
+Kenney (CC0 1.0 Universal)
+Car Kit — https://kenney.nl/assets/car-kit
+Used delivery truck, van, cone, parcel and the pack colour palette.
+City Kit (Industrial) — https://kenney.nl/assets/city-kit-industrial
+Used buildings C, F and P, water tower, medium chimney, tank, shipping container and the pack colour palette.
+The two pack directories contain the accompanying original licence notices. Models were consolidated and mapped to shared palette materials.
+
+Poly Haven (CC0 1.0 Universal) — https://polyhaven.com/license
+Drill Press 01 — Viktor — https://polyhaven.com/a/drill_press_01
+Bench Vice 01 — Antanas Kep (model and textures), Yann Kervran (rig) — https://polyhaven.com/a/bench_vice_01
+Metal Tool Chest — John Hutcheson (model and textures), Yann Kervran (rig) — https://polyhaven.com/a/metal_tool_chest
+Adjustable Wrench — Mateusz Sadek — https://polyhaven.com/a/adjustable_wrench
+Metal Stool 02 — Ulan Cabanilla — https://polyhaven.com/a/metal_stool_02
+Asphalt 04 — Sergej Majboroda (photography), Jenelle van Heerden (processing) — https://polyhaven.com/a/asphalt_04
+Concrete Floor 02 — Rob Tuytel — https://polyhaven.com/a/concrete_floor_02
+
+For the practice build, the workshop props were exported in static poses, reduced for real-time rendering and paired with 512px, softly desaturated albedos. Floor scans were downsampled and contrast-adjusted. The port layout, road taper, fabrication cell, safety guards, bay architecture, two-colour wall treatments and signage are project-specific arrangements. No authors of source assets endorse this simulation.
+CC0 1.0 Universal — https://creativecommons.org/publicdomain/zero/1.0/

@@ -7,8 +7,10 @@ namespace First180.Practice
         AudioSource heart, speaker, ambience, effects, breathing;
         AudioClip pulse, warning, ping, breath;
         float nextBeat;
+        AudioClip generatedRoomAir;
+        static readonly string[] LocationLoops = { "Cafe", "Commons", "Road", "Workshop" };
+        bool speakerPaused;
         public Transform robot;
-        Vector3 robotBase;
         void Awake()
         {
             heart=gameObject.AddComponent<AudioSource>();
@@ -19,14 +21,24 @@ namespace First180.Practice
             pulse=MakeTone("Heartbeat",0.36f,60,true);
             warning=MakeTone("Incident",0.8f,190,false);
             ping=MakeTone("Robot acknowledgment",0.15f,640,false);
-            ambience.clip=MakeAmbience();ambience.loop=true;ambience.volume=0.08f;ambience.Play();
-            if(robot) robotBase=robot.position;
+            var room = GetComponent<PracticeRoom>();
+            if (room && room.scenarioId >= 0 && room.scenarioId < LocationLoops.Length)
+                ambience.clip = Resources.Load<AudioClip>("LocationSound/" + LocationLoops[room.scenarioId]);
+            if (!ambience.clip) ambience.clip = generatedRoomAir = MakeAmbience();
+            ambience.loop=true;ambience.volume=0.08f;ambience.Play();
+            if (robot) robot.gameObject.SetActive(false);
         }
         void Update()
         {
             var room=GetComponent<PracticeRoom>();
             var session=PracticeSession.Get();
             AudioListener.volume=session.muted?0:0.65f;
+            if (room && room.Paused != speakerPaused)
+            {
+                speakerPaused = room.Paused;
+                if (speakerPaused) speaker.Pause();
+                else if (!session.certification) speaker.UnPause();
+            }
             if(room && room.EmergencyActive && !room.Paused && room.result==null)
             {
                 var state=room.patients[0].GetComponent<PatientManager>();
@@ -37,25 +49,24 @@ namespace First180.Practice
             }
             else breathing.volume=0;
             ambience.volume=room && room.Paused?0:room && room.scenarioId==4?.28f:.07f;
-            if(robot)
-            {
-                if(Camera.main)
-                {
-                    var view=Camera.main.transform;var f=Vector3.ProjectOnPlane(view.forward,Vector3.up).normalized;
-                    var goal=view.position+f*1.9f+Vector3.Cross(Vector3.up,f)*.8f;
-                    goal.y=view.position.y-.15f+Mathf.Sin(Time.time*2)*.06f;
-                    robot.position=Vector3.Lerp(robot.position,goal,Time.deltaTime*1.3f);
-                    robot.rotation=Quaternion.LookRotation(Vector3.ProjectOnPlane(robot.position-view.position,Vector3.up));
-                }
-                robot.gameObject.SetActive(!session.certification);
-            }
         }
         public void Speak(string key)
         {
             if(PracticeSession.Get().certification) return;
             AudioClip clip=Resources.Load<AudioClip>("PracticeVoice/"+key);
             speaker.Stop();
-            if(clip) { speaker.clip=clip;speaker.Play(); } else speaker.PlayOneShot(ping,0.2f);
+            speaker.clip = clip;
+            if(clip) speaker.Play();
+            else speaker.PlayOneShot(ping,0.2f);
+            if (speakerPaused) speaker.Pause();
+        }
+        public bool TryGetRookSpeechTime(out float seconds)
+        {
+            seconds = 0;
+            if (!speaker || !speaker.clip || !speaker.isPlaying || speakerPaused || PracticeSession.Get().certification)
+                return false;
+            seconds = (float)speaker.timeSamples / speaker.clip.frequency;
+            return true;
         }
         public void Alarm() { effects.PlayOneShot(warning,0.24f); }
         public void Feedback(bool correct){effects.PlayOneShot(correct?ping:warning,correct?.2f:.12f);}
@@ -86,7 +97,7 @@ namespace First180.Practice
         void OnDestroy()
         {
             if(pulse) Destroy(pulse);if(warning) Destroy(warning);if(ping) Destroy(ping);if(breath)Destroy(breath);
-            if(ambience && ambience.clip) Destroy(ambience.clip);
+            if(generatedRoomAir) Destroy(generatedRoomAir);
         }
     }
 }

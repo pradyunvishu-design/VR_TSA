@@ -15,18 +15,24 @@ namespace First180.Practice
         int heldHand=-1;float gravity;
         TreatmentTarget[] targets;TreatmentManager care;PracticeRoom room;
         LineRenderer leftRay,rightRay;
+        Material rayMaterial;
+        SpatialPanel panelUI;
+        readonly SpatialButton[] hovered = new SpatialButton[2];
         void Start()
         {
             room=FindFirstObjectByType<PracticeRoom>();care=room.GetComponent<TreatmentManager>();
+            panelUI=room.GetComponent<SpatialPanel>();
             targets=FindObjectsByType<TreatmentTarget>(FindObjectsSortMode.None);
+            rayMaterial = new Material(Resources.Load<Shader>("PracticePanelSurface")) {color = new Color(.2f,.85f,.8f)};
             leftRay=Ray(leftHand);rightRay=Ray(rightHand);
             var subsystems=new List<XRInputSubsystem>();SubsystemManager.GetSubsystems(subsystems);
             foreach(var sub in subsystems)sub.TrySetTrackingOriginMode(TrackingOriginModeFlags.Floor);
         }
+        void OnDestroy() { if (rayMaterial) Destroy(rayMaterial); }
         LineRenderer Ray(Transform hand)
         {
             var line=hand.gameObject.AddComponent<LineRenderer>();line.positionCount=2;line.startWidth=.007f;line.endWidth=.003f;
-            line.material=new Material(Shader.Find("Sprites/Default"));line.startColor=line.endColor=new Color(.2f,.85f,.8f);return line;
+            line.sharedMaterial=rayMaterial;line.startColor=line.endColor=new Color(.2f,.85f,.8f);return line;
         }
         static void Pose(XRNode node,Transform t)
         {
@@ -41,10 +47,17 @@ namespace First180.Practice
             Pose(XRNode.Head,head.transform);Pose(XRNode.LeftHand,leftHand);Pose(XRNode.RightHand,rightHand);
             var left=InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);var right=InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
             right.TryGetFeatureValue(CommonUsages.secondaryButton,out bool panel);
-            if(panel && !oldPanel)FindFirstObjectByType<SpatialPanel>()?.Recenter();oldPanel=panel;
+            if(panel && !oldPanel)panelUI?.Recenter();oldPanel=panel;
             left.TryGetFeatureValue(CommonUsages.menuButton,out bool menu);
-            if(menu && !oldMenu){room.TogglePause();FindFirstObjectByType<SpatialPanel>()?.Recenter();}oldMenu=menu;
-            if(room.Paused){Hand(right,rightHand,rightRay,1,ref oldTriggerR,ref oldGripR);return;}
+            if(menu && !oldMenu){room.TogglePause();panelUI?.RefreshPanel(true);panelUI?.Recenter();}oldMenu=menu;
+            left.TryGetFeatureValue(CommonUsages.primaryButton,out bool teleport);
+            if (PanelOnly)
+            {
+                Hand(left,leftHand,leftRay,0,ref oldTriggerL,ref oldGripL,true);
+                Hand(right,rightHand,rightRay,1,ref oldTriggerR,ref oldGripR,true);
+                oldTeleport=teleport;
+                return;
+            }
             var cc=GetComponent<CharacterController>();cc.height=Mathf.Clamp(head.transform.localPosition.y,1,2.2f);cc.center=new Vector3(head.transform.localPosition.x,cc.height/2,head.transform.localPosition.z);
             left.TryGetFeatureValue(CommonUsages.primary2DAxis,out Vector2 move);right.TryGetFeatureValue(CommonUsages.primary2DAxis,out Vector2 turn);
             Vector3 forward=Vector3.ProjectOnPlane(head.transform.forward,Vector3.up).normalized;
@@ -52,10 +65,9 @@ namespace First180.Practice
             cc.Move((Vector3.ClampMagnitude(forward*move.y+Vector3.Cross(Vector3.up,forward)*move.x,1)*moveSpeed+Vector3.up*gravity)*Time.deltaTime);
             if(Mathf.Abs(turn.x)<.3f)snapReady=true;
             if(snapReady && Mathf.Abs(turn.x)>.7f){transform.RotateAround(head.transform.position,Vector3.up,Mathf.Sign(turn.x)*30);snapReady=false;}
-            Hand(left,leftHand,leftRay,0,ref oldTriggerL,ref oldGripL);
-            Hand(right,rightHand,rightRay,1,ref oldTriggerR,ref oldGripR);
-            left.TryGetFeatureValue(CommonUsages.primaryButton,out bool teleport);
-            if(teleport && !oldTeleport && Physics.Raycast(leftHand.position,leftHand.forward,out var hit,8) && hit.normal.y>.9f && hit.point.y<.5f)
+            Hand(left,leftHand,leftRay,0,ref oldTriggerL,ref oldGripL,false);
+            Hand(right,rightHand,rightRay,1,ref oldTriggerR,ref oldGripR,PanelOnly);
+            if(!PanelOnly && teleport && !oldTeleport && Physics.Raycast(leftHand.position,leftHand.forward,out var hit,8,~0,QueryTriggerInteraction.Ignore) && hit.normal.y>.9f && hit.point.y<.5f)
             {
                 var p=hit.point+Vector3.up*.1f;
                 if(!Physics.CheckCapsule(p+Vector3.up*.35f,p+Vector3.up*1.6f,.23f,~0,QueryTriggerInteraction.Ignore))
@@ -63,30 +75,78 @@ namespace First180.Practice
             }
             oldTeleport=teleport;
         }
-        void Hand(InputDevice device,Transform hand,LineRenderer line,int index,ref bool oldTrigger,ref bool oldGrip)
+        bool PanelOnly => room.Paused || room.result!=null || PracticeSession.Get().dashboard;
+
+        void Hand(InputDevice device,Transform hand,LineRenderer line,int index,ref bool oldTrigger,ref bool oldGrip,bool panelOnly)
         {
-            device.TryGetFeatureValue(CommonUsages.triggerButton,out bool trigger);device.TryGetFeatureValue(CommonUsages.gripButton,out bool grip);
-            bool hitSomething=Physics.Raycast(hand.position,hand.forward,out var hit,12,~0,QueryTriggerInteraction.Collide);
-            line.SetPosition(0,hand.position);line.SetPosition(1,hitSomething?hit.point:hand.position+hand.forward*6);
-            if(care && care.held && heldHand==index)
+            device.TryGetFeatureValue(CommonUsages.triggerButton,out bool trigger);
+            device.TryGetFeatureValue(CommonUsages.gripButton,out bool grip);
+            bool found=Physics.Raycast(hand.position,hand.forward,out var hit,12,~0,QueryTriggerInteraction.Collide);
+            line.SetPosition(0,hand.position);
+            line.SetPosition(1,found?hit.point:hand.position+hand.forward*6);
+            ApplyHand(index, hand, found?hit.collider:null, hit.distance, trigger, trigger&&!oldTrigger, grip, grip&&!oldGrip, panelOnly);
+            oldTrigger=trigger;
+            oldGrip=grip;
+        }
+
+        // Both controllers use the same ownership, panel selection and world interaction path.
+        internal void ApplyHand(int index,Transform hand,Collider hit,float hitDistance,bool trigger,bool triggerDown,bool grip,bool gripDown,bool panelOnly)
+        {
+            if (PracticeSession.Get().loading) return;
+            bool holding=care && care.held && heldHand==index;
+            if (holding && !grip)
             {
-                TreatmentTarget nearest=null;float distance=.3f;
-                foreach(var target in targets)if(target && Vector3.Distance(care.held.transform.position,target.transform.position)<distance){distance=Vector3.Distance(care.held.transform.position,target.transform.position);nearest=target;}
-                care.Use(nearest,trigger,Time.deltaTime);
-                if(!grip && oldGrip){care.Release();heldHand=-1;}
+                care.Release();
+                heldHand=-1;
+                holding=false;
             }
-            else if(hitSomething)
+            var button=hit ? hit.GetComponentInParent<SpatialButton>() : null;
+            if (hovered[index]!=button)
             {
-                if(grip && !oldGrip && hit.distance<2.5f && care){var tool=hit.collider.GetComponentInParent<TreatmentTool>();if(tool){care.Grab(tool,hand);heldHand=index;}}
-                if(trigger && !oldTrigger)
+                if (hovered[index]) hovered[index].SetHover(index,false);
+                hovered[index]=button;
+                if (button) button.SetHover(index,true);
+            }
+            if (button)
+            {
+                if (holding && !panelOnly) care.Use(null,false,0);
+                if (triggerDown) { button.Invoke(); panelUI?.RefreshPanel(true); }
+                return;
+            }
+            if (panelUI && panelUI.OwnsSurface(hit))
+            {
+                if (holding && !panelOnly) care.Use(null,false,0);
+                return;
+            }
+            if (panelOnly) return;
+            if (holding)
+            {
+                TreatmentTarget nearest=null;
+                float best=.30f*.30f;
+                foreach (var target in targets)
                 {
-                    var button=hit.collider.GetComponentInParent<SpatialButton>();if(button)button.Invoke();
-                    else if(hit.collider.GetComponentInParent<PracticePortal>() is PracticePortal portal)portal.Use();
-                    else if(hit.collider.GetComponentInParent<PracticePatient>() is PracticePatient patient)room.Inspect(patient.patientId);
+                    if (!target) continue;
+                    float squared=(care.held.transform.position-target.transform.position).sqrMagnitude;
+                    if (squared<best){best=squared;nearest=target;}
+                }
+                care.Use(nearest,trigger,Time.deltaTime);
+                return;
+            }
+            if (!hit) return;
+            if (gripDown && hitDistance<2.5f && care && !care.held)
+            {
+                var tool=hit.GetComponentInParent<TreatmentTool>();
+                if (tool && !tool.Held)
+                {
+                    care.Grab(tool,hand);
+                    if(care.held==tool) heldHand=index;
+                    return;
                 }
             }
-            oldTrigger=trigger;oldGrip=grip;
+            if (!triggerDown) return;
+            var portal=hit.GetComponentInParent<PracticePortal>();
+            if (portal) portal.Use();
+            else if (hit.GetComponentInParent<PracticePatient>() is PracticePatient patient) room.Inspect(patient.patientId);
         }
-        void OnDestroy(){if(leftRay)Destroy(leftRay.material);if(rightRay)Destroy(rightRay.material);}
     }
 }

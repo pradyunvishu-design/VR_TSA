@@ -623,21 +623,6 @@ MonoBehaviour:
   - C
   incidentRoot: {fileID: 0}
   patients: []
-  result:
-    scenario: 0
-    mistakes: 0
-    stepsCompleted: 0
-    stepsRequired: 0
-    diagnosis: 0
-    priority: 0
-    quality: 0
-    efficiency: 0
-    score: 0
-    seconds: 0
-    firstActionSeconds: 0
-    completed: 0
-    timedOut: 0
-    events: []
   elapsed: 0
   calmTime: 0
   feedback: 
