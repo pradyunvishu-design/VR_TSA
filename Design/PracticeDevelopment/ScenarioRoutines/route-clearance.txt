@@ -1,0 +1,6 @@
+Cafe fixture hits Counter() static child Counter() moving overlaps Counter() examples {} minimum adult separation 1.5
+Dining fixture hits Counter() static child Counter() moving overlaps Counter() examples {} minimum adult separation 0.99
+Road fixture hits Counter() static child Counter() moving overlaps Counter() examples {} minimum adult separation 1.04
+Workshop fixture hits Counter() static child Counter() moving overlaps Counter() examples {} minimum adult separation 1.15
+Trail fixture hits Counter() static child Counter() moving overlaps Counter() examples {} minimum adult separation 1.0
+checked combined spatial assignments 480

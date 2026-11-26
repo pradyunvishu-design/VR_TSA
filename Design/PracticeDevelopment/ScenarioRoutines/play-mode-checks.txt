@@ -1,0 +1,204 @@
+Five-room encounter replay
+PULSE_ROUTINE_SEED=7639
+ROUTINE PASS Loaded routine 0 visit 0
+ROUTINE PASS Eligible adult PracticeWoman
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWoman.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 0
+ROUTINE PASS Reached assigned treatment mark (0.75, 0.00, 0.75) from (0.75, 0.00, 0.74)
+ROUTINE PASS Unseen incident waits without charging clock
+ROUTINE PASS Pause holds scene
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Cup striking tile
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler epinephrine
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 0
+ROUTINE PASS Loaded routine 0 visit 1
+ROUTINE PASS Eligible adult PracticeWorkshopMan
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWorkshopMan.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 0
+ROUTINE PASS Reached assigned treatment mark (-4.70, 0.00, 0.20) from (-4.70, 0.00, 0.19)
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Cup striking tile
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler epinephrine
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 0
+ROUTINE PASS Loaded routine 0 visit 2
+ROUTINE PASS Eligible adult PracticeWoman
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWoman.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 0
+ROUTINE PASS Reached assigned treatment mark (0.75, 0.00, 0.75) from (0.75, 0.00, 0.74)
+ROUTINE PASS Unseen incident waits without charging clock
+ROUTINE PASS Pause holds scene
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Cup striking tile
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Loaded routine 1 visit 0
+ROUTINE PASS Eligible adult DiningMan
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/DiningMan.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 1
+ROUTINE PASS Reached assigned treatment mark (-4.40, 0.00, -1.65) from (-4.40, 0.00, -1.64)
+ROUTINE PASS Unseen incident waits without charging clock
+ROUTINE PASS Pause holds scene
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Chair scraping the dining floor
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler backblows
+ROUTINE PASS Reachable clinical handler thrusts
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 1
+ROUTINE PASS Loaded routine 1 visit 1
+ROUTINE PASS Eligible adult PracticeWoman
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWoman.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 1
+ROUTINE PASS Reached assigned treatment mark (-0.60, 0.00, 1.85) from (-0.60, 0.00, 1.84)
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Chair scraping the dining floor
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler backblows
+ROUTINE PASS Reachable clinical handler thrusts
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 1
+ROUTINE PASS Loaded routine 2 visit 0
+ROUTINE PASS Eligible adult PracticeWorkshopMan
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWorkshopMan.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 2
+ROUTINE PASS Reached assigned treatment mark (4.00, 0.00, -1.30) from (4.00, 0.00, -1.31)
+ROUTINE PASS Unseen incident waits without charging clock
+ROUTINE PASS Pause holds scene
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Cart latch rattling
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler pressure
+ROUTINE PASS Reachable clinical handler tourniquet
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 2
+ROUTINE PASS Loaded routine 2 visit 1
+ROUTINE PASS Eligible adult PracticeWoman
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWoman.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 2
+ROUTINE PASS Reached assigned treatment mark (-4.35, 0.00, 0.45) from (-4.35, 0.00, 0.44)
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Cart latch rattling
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler pressure
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 2
+ROUTINE PASS Loaded routine 3 visit 0
+ROUTINE PASS Eligible adult PracticeWoman
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWoman.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 3
+ROUTINE PASS Reached assigned treatment mark (-0.55, 0.00, -0.85) from (-0.55, 0.00, -0.86)
+ROUTINE PASS Unseen incident waits without charging clock
+ROUTINE PASS Pause holds scene
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Spindle winding down
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Workshop injury belongs to the active patient
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler pressure
+ROUTINE PASS Reachable clinical handler tourniquet
+ROUTINE PASS Reachable clinical handler preserve
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 3
+ROUTINE PASS Loaded routine 3 visit 1
+ROUTINE PASS Eligible adult PracticeWorkshopMan
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWorkshopMan.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 3
+ROUTINE PASS Reached assigned treatment mark (-0.55, 0.00, -0.85) from (-0.55, 0.00, -0.86)
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Spindle winding down
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Workshop injury belongs to the active patient
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler pressure
+ROUTINE PASS Reachable clinical handler tourniquet
+ROUTINE PASS Reachable clinical handler preserve
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 3
+ROUTINE PASS Loaded routine 4 visit 0
+ROUTINE PASS Eligible adult PracticeWorkshopMan
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWorkshopMan.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 4
+ROUTINE PASS Reached assigned treatment mark (3.80, 0.00, -1.20) from (3.80, 0.00, -1.19)
+ROUTINE PASS Unseen incident waits without charging clock
+ROUTINE PASS Pause holds scene
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Hiker's double whistle
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Visible hand symptoms match the active hiker
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler shelter
+ROUTINE PASS Reachable clinical handler protect
+ROUTINE PASS Protection replaced cold fingers with the fitted dressing
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 4
+ROUTINE PASS Loaded routine 4 visit 1
+ROUTINE PASS Eligible adult PracticeWoman
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWoman.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 4
+ROUTINE PASS Reached assigned treatment mark (3.80, 0.00, -1.20) from (3.80, 0.00, -1.21)
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Hiker's double whistle
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Visible hand symptoms match the active hiker
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler shelter
+ROUTINE PASS Reachable clinical handler protect
+ROUTINE PASS Protection replaced cold fingers with the fitted dressing
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 4
+PULSE_ROUTINES_PASS
+
+Road replay with moving dispatch trolley
+PULSE_ROUTINE_SEED=7639
+ROUTINE PASS Loaded routine 2 visit 0
+ROUTINE PASS Eligible adult PracticeWoman
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWoman.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 2
+ROUTINE PASS Dispatcher wheeled a loaded trolley along the service lane
+ROUTINE PASS Reached assigned treatment mark (0.70, 0.00, -1.35) from (0.70, 0.00, -1.36)
+ROUTINE PASS Unseen incident waits without charging clock
+ROUTINE PASS Pause holds scene
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Cart latch rattling
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler pressure
+ROUTINE PASS Reachable clinical handler tourniquet
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 2
+ROUTINE PASS Loaded routine 2 visit 1
+ROUTINE PASS Eligible adult PracticeWorkshopMan
+ROUTINE PASS Visible adult uses Assets/Practice/Characters/PracticeWorkshopMan.fbx
+ROUTINE PASS Both eligible adults walked and collected props with two witnesses in 2
+ROUTINE PASS Dispatcher wheeled a loaded trolley along the service lane
+ROUTINE PASS Reached assigned treatment mark (-0.80, 0.00, 1.40) from (-0.80, 0.00, 1.39)
+ROUTINE PASS Recognition clock starts at perceptible onset
+ROUTINE PASS Local incident cue Cart latch rattling
+ROUTINE PASS Incident has a measurable signal within the listener's range
+ROUTINE PASS Reachable clinical handler safety
+ROUTINE PASS Reachable clinical handler call
+ROUTINE PASS Reachable clinical handler pressure
+ROUTINE PASS Reachable clinical handler tourniquet
+ROUTINE PASS Reachable clinical handler monitor
+ROUTINE PASS Treated and stabilized 2
+PULSE_ROUTINES_PASS

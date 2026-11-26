@@ -114,3 +114,11 @@ The local Unity Editor supplied [seven screenshots with captions](EnclosedBays/R
 ## November 26, 2026 — Open-air alpine trail
 
 Removed the frostbite chamber and restored the view of the mountains. The timber refuge and its roof remain available for the shelter handoff. The lobby window now shows the outdoor scene. Unity checked the open sky, all six placement marks per patient, all seven tools, shelter approach and return portal. [Unity Editor screenshot](AlpineTrail/Open-air-frostbite.jpg)
+
+## November 26, 2026 — Everyday activity and emergency discovery
+
+The café pilot exercises a customer walking to the counter, reaching for a cup and carrying it to an incident location. The two eligible, team-authored adults trade patient roles on consecutive entries. Both adults now have pickup-and-carry routines at independently assigned stations. Two more people use venue-specific walking routes. The dining hall has lunch trays, the service road has parcel dispatch, the workshop has tool collection, and the open alpine trail has route maps at the lookout and refuge. Four existing enclosures and the lobby remain as authored.
+
+Training waits until the learner sees the patient and silent ROOK can prompt the learner to look around. Certification can begin with an incident sound from the patient's location. Muted certification uses the visibility check. Treatment time starts at onset. Workshop injury geometry and alpine hand cues are fitted to both adult characters.
+
+The Windows Unity Play Mode tests exercised real scene transitions, walking, prop collection, alternating visible meshes, treatment with equipment, scoring, recovery, local cues and the muted run. After an alpine crossing failed in Play Mode, pedestrian departures were spaced using predicted routes. A geometry sweep of 480 assignments found 0.99 m minimum separation between the two walking adults. Static scene tests also verified the response-equipment approaches, return portals and the open sky above the trail. [Play Mode captures and verification](ScenarioRoutines/README.md)

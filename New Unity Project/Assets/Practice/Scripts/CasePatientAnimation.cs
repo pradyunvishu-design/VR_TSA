@@ -38,15 +38,106 @@ namespace First180.Practice
         float poseTime, previousTime, blendTime, previousRate = 1f;
         int observedActions;
         bool sawEmergency, showedRelief;
+        string castAppearance;
+        Transform patientMarker;
 
         public Beat CurrentBeat { get; private set; }
+        public string ActiveAppearance => castAppearance ?? (animator ? animator.name : string.Empty);
         public float PoseTime => poseTime;
         public bool DrivesVisual => graph.IsValid();
         public bool HasHandPresentation => coldFingers && handDressing;
 
+        // Exchange the supplied actors' skins while keeping the clinical animation and its
+        // treatment sockets on their authored skeleton. Both bodies use the team's named bones.
+        public bool ExchangeAppearance(CasePatientAnimation other)
+        {
+            var a = FindBody();
+            var b = other.FindBody();
+            if (!a || !b)
+            {
+                Debug.LogError($"Missing visible adult skin on {animator.name} or {other.animator.name}.", this);
+                return false;
+            }
+            if (!FitClinicalPresentation()) return false;
+            var bBones = RemapBones(a, other.animator);
+            var aMesh = a.sharedMesh;
+            var aMaterials = a.sharedMaterials;
+            var aBounds = a.localBounds;
+            BindSkin(a, b);
+            a.sharedMaterials = b.sharedMaterials;
+            b.sharedMesh = aMesh;
+            b.sharedMaterials = aMaterials;
+            b.bones = bBones;
+            b.localBounds = aBounds;
+            var oldName = ActiveAppearance;
+            castAppearance = other.ActiveAppearance;
+            other.castAppearance = oldName;
+            return true;
+        }
+
+        bool FitClinicalPresentation()
+        {
+            // The fitted variants use the same palette UVs as the team's intact bodies.
+            // Keep the scene's Cast colours material on each clinical renderer.
+            if (injured)
+            {
+                var model = Resources.Load<GameObject>("CastPresentation/WomanWorkshopInjury");
+                var stump = model ? model.GetComponentInChildren<SkinnedMeshRenderer>(true) : null;
+                if (!stump) return false;
+                BindSkin(injured, stump);
+            }
+            if (HasHandPresentation)
+            {
+                var model = Resources.Load<GameObject>("CastPresentation/ManTrailHand");
+                if (!model) return false;
+                var skins = model.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+                var fingers = Array.Find(skins, skin => skin.name == "ColdFingers");
+                var dressing = Array.Find(skins, skin => skin.name == "HandDressing");
+                if (!fingers || !dressing) return false;
+                BindSkin(coldFingers, fingers);
+                BindSkin(handDressing, dressing);
+            }
+            return true;
+        }
+
+        void BindSkin(SkinnedMeshRenderer destination, SkinnedMeshRenderer source)
+        {
+            destination.sharedMesh = source.sharedMesh;
+            destination.bones = RemapBones(source, animator);
+            destination.localBounds = source.localBounds;
+        }
+
+        SkinnedMeshRenderer FindBody()
+        {
+            if (!animator) return null;
+            foreach (var skin in animator.GetComponentsInChildren<SkinnedMeshRenderer>())
+                if (skin.enabled && skin.sharedMesh) return skin;
+            return null;
+        }
+
+        static Transform[] RemapBones(SkinnedMeshRenderer source, Animator destination)
+        {
+            var all = destination.GetComponentsInChildren<Transform>(true);
+            var remapped = source.bones;
+            for (int i = 0; i < remapped.Length; i++)
+            {
+                var sourceBone = remapped[i];
+                // FBX also exposes unweighted clinical socket and armature nodes in its
+                // skin palette. A different case may lack the socket; its parent is the
+                // matching deform bone. The weighted bones themselves always match.
+                Transform mapped = null;
+                for (var node = sourceBone; node && !mapped; node = node.parent)
+                    mapped = Array.Find(all, t => t.name == node.name);
+                remapped[i] = mapped ? mapped : destination.transform;
+            }
+            return remapped;
+        }
+
         void Start()
         {
             patient = GetComponent<PracticePatient>();
+            patientMarker = transform.Find("Patient marker");
+            if (patientMarker && room && room.scenarioId >= 0) patientMarker.gameObject.SetActive(false);
             state = GetComponent<PatientManager>();
             if (!room || !animator || !idle || !onset || !distress)
             {
@@ -80,12 +171,20 @@ namespace First180.Practice
             if (room.EmergencyActive && !sawEmergency)
             {
                 sawEmergency = true;
+                if (patientMarker) patientMarker.gameObject.SetActive(true);
                 if (intact && injured)
                 {
                     intact.enabled = false;
                     injured.enabled = true;
                 }
                 Play(Beat.Onset);
+            }
+            if (sawEmergency && patientMarker && Camera.main)
+            {
+                var away = patientMarker.position - Camera.main.transform.position;
+                away.y = 0f;
+                if (away.sqrMagnitude > .001f)
+                    patientMarker.rotation = Quaternion.LookRotation(away);
             }
 
             bool lead = patient.patientId == 0;

@@ -36,6 +36,10 @@ namespace First180.Practice
         PracticeSession session;
         PracticeAudio audioSystem;
         RookInstructor instructor;
+        ScenarioRoutine routine;
+        float visibleSeconds;
+        float observationWait;
+        bool promptedToLook;
         void Start()
         {
             result=null;
@@ -65,6 +69,7 @@ namespace First180.Practice
                     instructor.Present(feedback);
                 }
                 PlacePatients();
+                routine = ScenarioRoutine.StartFor(this);
             }
             if(incidentRoot) incidentRoot.SetActive(false);
         }
@@ -75,7 +80,25 @@ namespace First180.Practice
             if(!EmergencyActive)
             {
                 calmTime-=Time.deltaTime;
-                if(calmTime<=0) BeginEmergency();
+                if(calmTime<=0 && (!routine || routine.ReadyForIncident))
+                {
+                    // A muted certification run also needs a perceptible first cue.
+                    bool needsSight = !session.certification || session.muted;
+                    if (needsSight)
+                    {
+                        var eye = Camera.main;
+                        visibleSeconds = LeadInView(eye) ? visibleSeconds + Time.deltaTime : 0f;
+                        observationWait += Time.deltaTime;
+                        if (instructor && eye && !promptedToLook && observationWait > 5f)
+                        {
+                            Vector3 relative = eye.transform.InverseTransformPoint(patients[0].transform.position);
+                            string direction = relative.z < 0f ? "behind you" : relative.x < 0f ? "to your left" : "to your right";
+                            instructor.Present("Look " + direction + " and watch how the person moves.");
+                            promptedToLook = true;
+                        }
+                    }
+                    if (!needsSight || visibleSeconds >= .15f) BeginEmergency();
+                }
                 return;
             }
             elapsed+=Time.deltaTime;
@@ -84,11 +107,24 @@ namespace First180.Practice
         public void BeginEmergency()
         {
             if(scenarioId<0 || EmergencyActive) return;
+            if (routine) routine.InterruptForCare();
             EmergencyActive=true;elapsed=0;
             if(incidentRoot) incidentRoot.SetActive(true);
-            audioSystem.Alarm();
+            audioSystem.SignalIncident(patients[0].transform);
             feedback = session.certification ? "Incident active." : "ROOK: Inspect the patients and choose who needs care first.";
             PresentInstruction();
+        }
+        bool LeadInView(Camera eye)
+        {
+            if (!eye) return false;
+            Transform patient = patients[0].transform;
+            Vector3 target = patient.position + Vector3.up * 1.28f;
+            Vector3 screen = eye.WorldToViewportPoint(target);
+            // The desktop brief occupies the right quarter; keep the cue inside the clear viewing area.
+            if (screen.z < eye.nearClipPlane || screen.x < .27f || screen.x > .71f ||
+                screen.y < .15f || screen.y > .83f) return false;
+            return !Physics.Linecast(eye.transform.position, target, out var hit, eye.cullingMask,
+                       QueryTriggerInteraction.Ignore) || hit.transform.IsChildOf(patient);
         }
         void PresentInstruction()
         {

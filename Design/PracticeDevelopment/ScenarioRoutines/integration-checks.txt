@@ -1,0 +1,14 @@
+PATIENT_MARKS_PASS=Cafe_Anaphylaxis / six verified marks per patient
+LOCATION_ROUTES_PASS=Cafe_Anaphylaxis / 5 tools, three patients, return portal
+PATIENT_MARKS_PASS=Dining_ObstructedAirways / six verified marks per patient
+LOCATION_ROUTES_PASS=Dining_ObstructedAirways / 6 tools, three patients, return portal
+PATIENT_MARKS_PASS=Road_Hemorrhaging / six verified marks per patient
+LOCATION_ROUTES_PASS=Road_Hemorrhaging / 7 tools, three patients, return portal
+PATIENT_MARKS_PASS=Workshop_LostLimb / six verified marks per patient
+LOCATION_ROUTES_PASS=Workshop_LostLimb / 8 tools, three patients, return portal
+PATIENT_MARKS_PASS=Trail_Frostbite / six verified marks per patient
+LOCATION_ROUTES_PASS=Trail_Frostbite / 7 tools, three patients, return portal
+PRACTICE_ASSERTIONS_PASSED=2441
+PRACTICE_RUNTIME_SMOKE=PASS
+Passing Play Mode regression cases: 207
+Windows x64 build succeeded in Unity 6000.5.10f1. The delivered player contains all 7 enabled scenes and 199 files verified against build output.

@@ -4,6 +4,28 @@ namespace First180.Practice
 {
     public partial class PracticeRoom
     {
+        // Remember which eligible adult was seen last across visits in this play session.
+        static readonly System.Collections.Generic.Dictionary<int, bool> lastCastSwap = new();
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetCastHistory() => lastCastSwap.Clear();
+
+        void AssignPatientCast()
+        {
+            var lead = patients[0].GetComponent<CasePatientAnimation>();
+            // Each case has two supplied adult actors and one pediatric bystander.
+            int otherAdult = scenarioId == 1 || scenarioId == 2 ? 1 : 2;
+            var alternate = patients[otherAdult].GetComponent<CasePatientAnimation>();
+            if (!lead || !alternate) return;
+            bool swap = lastCastSwap.TryGetValue(scenarioId, out bool previous) ? !previous : Random.value < .5f;
+            if (swap && !lead.ExchangeAppearance(alternate))
+            {
+                Debug.LogError("Eligible adult cast could not be bound to the case skeleton.", this);
+                return;
+            }
+            lastCastSwap[scenarioId] = swap;
+        }
+
         // Pairs of floor marks for the left, middle and right aisles as seen from the entrance.
         // Keep the equipment station, treatment approaches and alpine shelter doorway clear.
         static readonly Vector2[,] patientMarks =
@@ -23,6 +45,7 @@ namespace First180.Practice
 
         void PlacePatients()
         {
+            AssignPatientCast();
             // Shuffle the physical assignments only. Clinical IDs and their attached anatomy stay together.
             int[] slots = { 0, 1, 2 };
             for (int i = slots.Length - 1; i > 0; i--)

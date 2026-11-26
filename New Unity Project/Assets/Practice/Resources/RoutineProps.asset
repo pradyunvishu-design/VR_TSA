@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdeab07b0fd84164b362a4b1225b94a1, type: 3}
+  m_Name: RoutineProps
+  m_EditorClassIdentifier: Assembly-CSharp::First180.Practice.RoutineProps
+  items:
+  - mesh: {fileID: -2432090755550338912, guid: fb4cbd42792a54c47a3295ef99dfcc18, type: 3}
+    finish: {fileID: 2100000, guid: 1c69fea19cce89343903d156cc8526b5, type: 2}
+    length: 0.17
+    tilt: {x: 0, y: 30, z: 0}
+  - mesh: {fileID: -2432090755550338912, guid: 0693e5ed50ac5434291f424d20806098, type: 3}
+    finish: {fileID: 2100000, guid: 1c69fea19cce89343903d156cc8526b5, type: 2}
+    length: 0.34
+    tilt: {x: 0, y: 0, z: 0}
+  - mesh: {fileID: -2432090755550338912, guid: e26fc24c012f2c9428d7ba4f075fb2c2, type: 3}
+    finish: {fileID: 2100000, guid: 1c69fea19cce89343903d156cc8526b5, type: 2}
+    length: 0.16
+    tilt: {x: 0, y: 28, z: 0}
+  - model: {fileID: 919132149155446097, guid: dc5c10a129403b945aa4feb058cb063b, type: 3}
+    finish: {fileID: 2100000, guid: 72b0b5b5197e4004d88112e600891dee, type: 2}
+    length: 0.33
+    tilt: {x: 0, y: 0, z: 0}
+  - model: {fileID: 919132149155446097, guid: b51778ae6b3f5014a8adbc9538f267af, type: 3}
+    finish: {fileID: 2100000, guid: 6b2db260eccb0d7449bc4d518483a744, type: 2}
+    length: 0.25
+    tilt: {x: 89, y: 27, z: 0}
+  girl: {fileID: 919132149155446097, guid: b9d4ca13ad1017942a4e2ac8f43e9469, type: 3}
+  boy: {fileID: 919132149155446097, guid: 26c4ae5449d14bb4980a5cc9a8a1e5a4, type: 3}
+  cast: {fileID: 2100000, guid: ca3b3c39fa03c4e46b283e7a874cb683, type: 2}
+  enamel: {fileID: 2100000, guid: 75b73f6238cfd7a47bdec9a67162a912, type: 2}
+  linen: {fileID: 2100000, guid: 879a66cc3cb96b44fa78b56351cae64c, type: 2}
+  metal: {fileID: 2100000, guid: 5c05b28e44763734a9a808f8363e2e9d, type: 2}
+  charcoal: {fileID: 2100000, guid: 3a37f3faf2dc35d4a96c147f5580fb4d, type: 2}
+  lettering: {fileID: 2100000, guid: 2ef92978c0d1a154ca2fa699f19558ae, type: 2}
