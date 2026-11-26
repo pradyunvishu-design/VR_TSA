@@ -17,7 +17,7 @@ namespace First180.Practice.Editor
         static readonly Vector3[] Subjects = {
             new Vector3(0,1.6f,6),new Vector3(.8f,1.5f,6),new Vector3(.4f,1.7f,7),
             new Vector3(3.3f,1.35f,4.5f),new Vector3(-4.4f,1.9f,4.1f)};
-        [MenuItem("FIRST180 Practice/Environment/Photograph destinations for lobby windows")]
+        [MenuItem("PULSE/Environment/Photograph destinations for lobby windows")]
         public static void Bake()
         {
             var open = SceneManager.GetActiveScene();
@@ -34,6 +34,16 @@ namespace First180.Practice.Editor
                 }
             }
             finally { EditorSceneManager.OpenScene(originalPath); }
+            AssetDatabase.SaveAssets();
+        }
+        internal static void PhotographOpenScenario()
+        {
+            var scene = SceneManager.GetActiveScene();
+            var room = Object.FindFirstObjectByType<PracticeRoom>();
+            if (EditorApplication.isPlaying || scene.isDirty || SceneManager.sceneCount != 1 ||
+                !room || room.scenarioId < 0 || room.Definition.scene != scene.name)
+                throw new InvalidOperationException("Open a saved practice scenario before updating its window.");
+            Photograph(room.scenarioId, scene.name);
             AssetDatabase.SaveAssets();
         }
         static void Photograph(int id, string destination)

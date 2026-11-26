@@ -153,7 +153,7 @@ namespace First180.Practice.Editor
             var p=o.AddComponent<PracticePortal>();p.returnToHub=true;p.label="Return to lobby";
             Text("Return label","RETURN\nTO LOBBY",new Vector3(8,1.65f,-5.12f),.13f);
         }
-        [MenuItem("FIRST180 Practice/Build missing practice scenes")]
+        [MenuItem("PULSE/Build missing practice scenes")]
         public static void BuildAll()
         {
             Directory.CreateDirectory(Root+"/Scenes");Directory.CreateDirectory(Root+"/Materials");

@@ -9,7 +9,7 @@ namespace First180.Practice.Editor
     [InitializeOnLoad]
     public static class PracticeCheckpoint
     {
-        [Serializable] class Command { public string id, action, scene, selection; public Vector3 eye, subject; public float fov = 65; }
+        [Serializable] class Command { public string id, action, scene, selection; public Vector3 eye, subject; public float fov = 65; public bool maximize; }
         static string LastKey="First180.Practice.LastEditorCommand";
         static double next;
         static PracticeCheckpoint(){EditorApplication.update+=Tick;}
@@ -33,9 +33,21 @@ namespace First180.Practice.Editor
                     PracticeEnvironmentArt.Apply();
                     if(!EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene())) throw new IOException("Could not save the scenario.");
                 }
-                else if(c.action=="frame" && !EditorApplication.isPlaying) DocumentationCamera.Frame(c.eye,c.subject,c.fov);
+                else if(c.action=="frame" && !EditorApplication.isPlaying) DocumentationCamera.Frame(c.eye,c.subject,c.fov,c.maximize);
                 else if(c.action=="windows" && !EditorApplication.isPlaying) LobbyWindowPhotos.Bake();
+                else if(c.action=="window" && !EditorApplication.isPlaying) LobbyWindowPhotos.PhotographOpenScenario();
                 else if(c.action=="routes" && !EditorApplication.isPlaying) EnvironmentRouteChecks.Run();
+                else if(c.action=="bay" && !EditorApplication.isPlaying)
+                {
+                    var scene = EditorSceneManager.GetActiveScene();
+                    var room = UnityEngine.Object.FindFirstObjectByType<PracticeRoom>();
+                    var art = GameObject.Find("Location art");
+                    if (scene.isDirty || !room || room.scenarioId < 0 || !art)
+                        throw new InvalidOperationException("Open a saved practice scenario before applying its enclosure.");
+                    ScenarioBayArchitecture.Apply(room, art.transform);
+                    ScenarioBayArchitecture.Verify(room, art.transform);
+                    if (!EditorSceneManager.SaveScene(scene)) throw new IOException("Could not save the enclosed scenario.");
+                }
                 else if(c.action=="sharedart" && !EditorApplication.isPlaying)
                 {
                     var scene = EditorSceneManager.GetActiveScene();
@@ -58,12 +70,13 @@ namespace First180.Practice.Editor
                 else if(c.action=="scene" && !EditorApplication.isPlaying)
                 {
                     if(EditorSceneManager.GetActiveScene().isDirty){Debug.LogError("Checkpoint refused to discard unsaved scene changes.");return;}
-                    EditorSceneManager.OpenScene("Assets/Practice/Scenes/"+c.scene+".unity");
+                    string directory = c.scene == "FIRST180_Lobby" ? "Assets/Scenes/" : "Assets/Practice/Scenes/";
+                    EditorSceneManager.OpenScene(directory+c.scene+".unity");
                     var view=SceneView.GetWindow<SceneView>();view.Focus();view.sceneLighting=true;
                     view.LookAt(new Vector3(0,1,1),Quaternion.Euler(18,0,0),11,false,true);
                 }
                 else if(c.action=="inspect")Selection.activeGameObject=GameObject.Find(c.selection);
-                else if(c.action=="game")DocumentationCamera.FocusGame();
+                else if(c.action=="game")DocumentationCamera.FocusGame(c.maximize);
                 Debug.Log("CHECKPOINT_COMMAND_DONE="+c.id);
             }
             catch(Exception e){Debug.LogException(e);}

@@ -15,7 +15,8 @@ namespace First180.Practice
         RectTransform typeArea;
         Material backing, buttonFace;
         Font font;
-        Text body;
+        Texture2D pulseWordmark;
+        Text body, patientIdentity;
         SpatialButton prioritize;
         string stage = "";
         float nextRefresh;
@@ -27,6 +28,7 @@ namespace First180.Practice
             room=GetComponent<PracticeRoom>();
             session=PracticeSession.Get();
             treatment=GetComponent<TreatmentManager>();
+            pulseWordmark=Resources.Load<Texture2D>("PulseWordmark");
             font=Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             var shader=Resources.Load<Shader>("PracticePanelSurface");
             backing=new Material(shader){color=new Color(.025f,.05f,.075f)};
@@ -73,6 +75,7 @@ namespace First180.Practice
                 Build();
             }
             if (prioritize) prioritize.SetAvailable(room.inspected>=0);
+            if (patientIdentity) patientIdentity.text=room.PatientPanelIdentity;
             body.text=Body();
         }
 
@@ -119,6 +122,7 @@ namespace First180.Practice
                 Destroy(child.gameObject);
             }
             prioritize=null;
+            patientIdentity=null;
             var bg=GameObject.CreatePrimitive(PrimitiveType.Cube);
             bg.name="Panel backing";bg.transform.SetParent(content,false);
             bg.transform.localScale=new Vector3(Width,1.33f,.018f);
@@ -137,9 +141,22 @@ namespace First180.Practice
                 "dashboard"=>page==0?"Certification results":ScenarioCatalog.All[session.results[page-1].scenario].title,
                 _=>session.certification?"Case recorded":"Training debrief"
             };
-            Label(title,-600,608,1200,82,49,true);
+            var logo = new GameObject("PULSE",typeof(RectTransform),typeof(RawImage)).GetComponent<RawImage>();
+            logo.rectTransform.SetParent(typeArea,false);
+            logo.rectTransform.anchoredPosition = new Vector2(495,566);
+            logo.rectTransform.sizeDelta = new Vector2(216,60);
+            logo.texture = pulseWordmark;
+            logo.raycastTarget = false;
+            Label(title,-600,608,950,82,49,true);
             bool tall=stage=="care"||stage=="result"||stage=="dashboard"||stage=="normal";
-            body=Label("",-595,497,1184,tall?590:363,35);
+            bool hasPatient=stage=="triage" || stage=="diagnose" || stage=="care";
+            if (hasPatient)
+            {
+                patientIdentity=Label(room.PatientPanelIdentity,-595,506,1184,50,32,true);
+                patientIdentity.color=new Color(.42f,.94f,.83f);
+            }
+            float bodyTop=hasPatient?438:497;
+            body=Label("",-595,bodyTop,1184,tall?(hasPatient?527:590):(hasPatient?298:363),35);
             if (stage=="hub")
             {
                 for(int i=0;i<5;i++){int id=i;Button(ScenarioCatalog.All[i].title+"   "+session.best[i]+"%",i,()=>session.StartTraining(id));}
@@ -192,12 +209,14 @@ namespace First180.Practice
         {
             switch(stage)
             {
-                case "hub": return "Earn 100% in every scenario to unlock certification.\n\nGrip to pick up equipment. Trigger to select or use. Left stick to move, right stick to turn. Left X teleports. Right B recalls this panel.";
+                case "hub": return "Earn 100% in every scenario to unlock certification.\n\nWalk up to a scenario or point and press trigger. Left stick moves, right stick turns. Left X teleports. Right B recalls this panel.";
                 case "normal": return room.Definition.normal;
                 case "paused": return "Sound "+(session.muted?"off":"on")+"\nUse either trigger to select. Right B recalls this panel.";
-                case "triage": case "diagnose": return room.inspected>=0?"Patient "+room.patientLabels[room.inspected]+"\n"+room.observation:"Inspect a patient to view their condition.";
+                case "triage": case "diagnose": return room.inspected>=0?"Findings\n"+room.observation:"Select a patient to record your observations.";
                 case "care":
-                    string detail=showingObservation?room.observation:session.certification?"Elapsed "+room.elapsed.ToString("0")+" s  /  Limit "+room.Definition.timeLimit+" s":room.feedback;
+                    string detail=showingObservation?"Reassessment\n"+room.observation:session.certification
+                        ?"Elapsed "+room.elapsed.ToString("0")+" s  /  Limit "+room.Definition.timeLimit+" s"
+                        :room.TrainingStepLabel+"\n"+room.CurrentTrainingInstruction;
                     string status=treatment.held?treatment.held.name+"\n"+treatment.status:"Grip to pick up equipment. Hold the trigger at the body target. Release grip to return it.";
                     return detail+"\n\n"+status;
                 case "result": return session.certification?"Case "+(session.round+1)+" of 5 recorded.":"Score  "+room.result.score+"%\nErrors  "+room.result.mistakes+"\nActions  "+room.result.stepsCompleted+" / "+room.result.stepsRequired+"\n\n"+(room.result.score==100?"Scenario mastered.":"Earn 100% to master this scenario.");

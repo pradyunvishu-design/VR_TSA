@@ -23,7 +23,7 @@ namespace First180.Practice.Editor
             var o=Shape(name,PrimitiveType.Sphere,patient.transform,p,new Vector3(.18f,.18f,.10f));o.GetComponent<Collider>().isTrigger=true;
             var t=o.AddComponent<TreatmentTarget>();t.actions=actions;t.patientId=patient.patientId;t.anatomicalSite=name;o.GetComponent<Renderer>().enabled=false;
         }
-        [MenuItem("FIRST180 Practice/Add modular interactions and PC VR")]
+        [MenuItem("PULSE/Add modular interactions and PC VR")]
         public static void Upgrade()
         {
             Directory.CreateDirectory(Root+"/Configs");

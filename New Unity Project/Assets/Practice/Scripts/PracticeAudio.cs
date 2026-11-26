@@ -4,17 +4,15 @@ namespace First180.Practice
 {
     public class PracticeAudio : MonoBehaviour
     {
-        AudioSource heart, speaker, ambience, effects, breathing;
+        AudioSource heart, ambience, effects, breathing;
         AudioClip pulse, warning, ping, breath;
         float nextBeat;
         AudioClip generatedRoomAir;
         static readonly string[] LocationLoops = { "Cafe", "Commons", "Road", "Workshop" };
-        bool speakerPaused;
         public Transform robot;
         void Awake()
         {
             heart=gameObject.AddComponent<AudioSource>();
-            speaker=gameObject.AddComponent<AudioSource>();
             ambience=gameObject.AddComponent<AudioSource>();
             effects=gameObject.AddComponent<AudioSource>();
             breathing=gameObject.AddComponent<AudioSource>();breath=MakeBreath();breathing.clip=breath;breathing.loop=true;breathing.volume=0;breathing.Play();
@@ -33,12 +31,6 @@ namespace First180.Practice
             var room=GetComponent<PracticeRoom>();
             var session=PracticeSession.Get();
             AudioListener.volume=session.muted?0:0.65f;
-            if (room && room.Paused != speakerPaused)
-            {
-                speakerPaused = room.Paused;
-                if (speakerPaused) speaker.Pause();
-                else if (!session.certification) speaker.UnPause();
-            }
             if(room && room.EmergencyActive && !room.Paused && room.result==null)
             {
                 var state=room.patients[0].GetComponent<PatientManager>();
@@ -49,24 +41,6 @@ namespace First180.Practice
             }
             else breathing.volume=0;
             ambience.volume=room && room.Paused?0:room && room.scenarioId==4?.28f:.07f;
-        }
-        public void Speak(string key)
-        {
-            if(PracticeSession.Get().certification) return;
-            AudioClip clip=Resources.Load<AudioClip>("PracticeVoice/"+key);
-            speaker.Stop();
-            speaker.clip = clip;
-            if(clip) speaker.Play();
-            else speaker.PlayOneShot(ping,0.2f);
-            if (speakerPaused) speaker.Pause();
-        }
-        public bool TryGetRookSpeechTime(out float seconds)
-        {
-            seconds = 0;
-            if (!speaker || !speaker.clip || !speaker.isPlaying || speakerPaused || PracticeSession.Get().certification)
-                return false;
-            seconds = (float)speaker.timeSamples / speaker.clip.frequency;
-            return true;
         }
         public void Alarm() { effects.PlayOneShot(warning,0.24f); }
         public void Feedback(bool correct){effects.PlayOneShot(correct?ping:warning,correct?.2f:.12f);}

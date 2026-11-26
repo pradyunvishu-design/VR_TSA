@@ -13,9 +13,9 @@ namespace First180.Editor
         private const string ScenePath = "Assets/Scenes/FIRST180_Lobby.unity";
         private const string MaterialFolder = "Assets/Materials/FIRST180";
         private const string VersionMarkerPath = "Assets/Scenes/FIRST180_Lobby.version.txt";
-        private const string GeneratorVersion = "2.2-mind-storm-inspired";
+        private const string GeneratorVersion = "3.0-medical-simulation-centre";
 
-        private static readonly Color White = new Color(0.82f, 0.84f, 0.84f);
+        private static readonly Color White = new Color(0.72f, 0.76f, 0.75f);
         private static readonly Color SoftWhite = new Color(0.52f, 0.55f, 0.56f);
         private static readonly Color Dark = new Color(0.012f, 0.018f, 0.022f);
         private static readonly Color DarkPanel = new Color(0.018f, 0.03f, 0.036f);
@@ -45,11 +45,11 @@ namespace First180.Editor
             }
         }
 
-        [MenuItem("FIRST//180/Regenerate Lobby Scene")]
+        [MenuItem("PULSE/Regenerate Lobby Scene")]
         private static void RegenerateLobby()
         {
             if (!EditorUtility.DisplayDialog(
-                    "Regenerate FIRST//180 Lobby",
+                    "Regenerate PULSE Lobby",
                     "This replaces the generated lobby scene. Continue?",
                     "Regenerate",
                     "Cancel"))
@@ -81,38 +81,41 @@ namespace First180.Editor
 
             Material ceramic = Material("Gallery Ceramic", White, 0.04f, 0.58f);
             Material concrete = Material("Warm Concrete", new Color(0.34f, 0.35f, 0.34f), 0.02f, 0.32f);
-            Material wood = Material("Ceiling Walnut", new Color(0.31f, 0.285f, 0.255f), 0.02f, 0.34f);
+            Material flooring = Material("Gallery Flooring", new Color(0.42f, 0.47f, 0.46f), 0.02f, 0.22f);
+            Material wood = Material("Ceiling Walnut", new Color(0.34f, 0.265f, 0.195f), 0.02f, 0.34f);
             Material metal = Material("Brushed Metal", new Color(0.20f, 0.22f, 0.23f), 0.82f, 0.62f);
             Material darkMat = Material("Floor Charcoal", Dark, 0.12f, 0.42f);
             Material panelMat = Material("Display Glass", DarkPanel, 0.55f, 0.86f);
             Material trunkMat = Material("Tree Trunk", new Color(0.12f, 0.055f, 0.025f), 0.01f, 0.24f);
-            Material foliageMat = Material("Amber Foliage", new Color(0.82f, 0.20f, 0.018f), 0.02f, 0.34f);
+            Material foliageMat = Material("Amber Foliage", new Color(0.69f, 0.29f, 0.045f), 0.02f, 0.34f);
             Material cyanMat = EmissiveMaterial("Lobby Cyan", Cyan, 2.2f);
 
-            GameObject root = new GameObject("FIRST//180 - TRAINING LOBBY");
-            BuildArchitecture(root.transform, ceramic, concrete, wood, metal, darkMat, cyanMat);
+            GameObject root = new GameObject("PULSE - TRAINING LOBBY");
+            BuildArchitecture(root.transform, ceramic, concrete, flooring, wood, metal, darkMat, cyanMat);
             BuildCentralSculpture(root.transform, ceramic, concrete, metal, trunkMat, foliageMat, cyanMat);
             BuildScenarioGallery(root.transform, ceramic, metal, panelMat);
+            BuildClinicalWayfinding(root.transform, ceramic, panelMat, cyanMat);
             BuildLighting(root.transform);
             Camera camera = BuildCamera(root.transform);
 
             RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(0.74f, 0.77f, 0.79f);
-            RenderSettings.ambientEquatorColor = new Color(0.52f, 0.54f, 0.55f);
-            RenderSettings.ambientGroundColor = new Color(0.30f, 0.31f, 0.32f);
-            RenderSettings.ambientIntensity = 1.12f;
-            RenderSettings.fog = true;
-            RenderSettings.fogColor = new Color(0.72f, 0.74f, 0.75f);
-            RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogStartDistance = 38f;
-            RenderSettings.fogEndDistance = 82f;
+            RenderSettings.ambientSkyColor = new Color(0.51f, 0.56f, 0.59f);
+            RenderSettings.ambientEquatorColor = new Color(0.38f, 0.41f, 0.42f);
+            RenderSettings.ambientGroundColor = new Color(0.27f, 0.25f, 0.23f);
+            RenderSettings.fog = false;
 
             CapturePreview(camera);
 
             EditorSceneManager.SaveScene(lobbyScene, ScenePath);
             File.WriteAllText(Path.Combine(Application.dataPath, "Scenes", "FIRST180_Lobby.version.txt"), GeneratorVersion);
             AssetDatabase.ImportAsset(VersionMarkerPath, ImportAssetOptions.ForceUpdate);
-            EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
+            var buildScenes = EditorBuildSettings.scenes;
+            if (!System.Array.Exists(buildScenes, scene => scene.path == ScenePath))
+            {
+                System.Array.Resize(ref buildScenes, buildScenes.Length + 1);
+                buildScenes[buildScenes.Length - 1] = new EditorBuildSettingsScene(ScenePath, true);
+                EditorBuildSettings.scenes = buildScenes;
+            }
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
@@ -124,13 +127,14 @@ namespace First180.Editor
             }
 
             EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath));
-            Debug.Log("FIRST//180 lobby generated at " + ScenePath);
+            Debug.Log("PULSE lobby generated at " + ScenePath);
         }
 
         private static void BuildArchitecture(
             Transform parent,
             Material ceramic,
             Material concrete,
+            Material flooring,
             Material wood,
             Material metal,
             Material dark,
@@ -140,46 +144,41 @@ namespace First180.Editor
             architecture.transform.SetParent(parent);
             Vector3 center = new Vector3(0f, 0f, 4f);
 
-            CreateCylinder("Gallery Floor", architecture.transform, center + new Vector3(0f, -0.22f, 0f), new Vector3(15.4f, 0.18f, 15.4f), ceramic);
-            CreateCylinder("Inset Floor", architecture.transform, center + new Vector3(0f, -0.015f, 0f), new Vector3(12.9f, 0.035f, 12.9f), ceramic);
-            CreateCube("Entry Threshold", architecture.transform, new Vector3(0f, 0.03f, -11.0f), new Vector3(7.6f, 0.09f, 7.0f), ceramic);
-            CreateCube("Entry Runner", architecture.transform, new Vector3(0f, 0.085f, -7.5f), new Vector3(4.2f, 0.045f, 8.8f), dark);
-            CreateCube("Entry Light Left", architecture.transform, new Vector3(-2.08f, 0.13f, -7.4f), new Vector3(0.045f, 0.02f, 8.3f), cyan);
-            CreateCube("Entry Light Right", architecture.transform, new Vector3(2.08f, 0.13f, -7.4f), new Vector3(0.045f, 0.02f, 8.3f), cyan);
+            CreateCylinder("Gallery Floor", architecture.transform, center + new Vector3(0f, -0.194f, 0f), new Vector3(30.8f, 0.18f, 30.8f), flooring);
+            CreateCylinder("Inset Floor", architecture.transform, center + new Vector3(0f, -0.055f, 0f), new Vector3(25.8f, 0.055f, 25.8f), flooring);
 
-            const int wallSegments = 48;
+            var runner = CreateCube("Entry Runner", architecture.transform, new Vector3(0f, 0.004f, -7.4f),
+                new Vector3(4.2f, 0.006f, 5.6f), dark);
+            Object.DestroyImmediate(runner.GetComponent<Collider>());
+            for (int side = -1; side <= 1; side += 2)
+                Object.DestroyImmediate(CreateCube("Entry guide strip", architecture.transform, new Vector3(side * 2.07f, 0.012f, -7.4f),
+                    new Vector3(0.034f, 0.01f, 5.56f), cyan).GetComponent<Collider>());
+
+            var roof = CreateCylinder("Sealed roof", architecture.transform, center + Vector3.up * 7.82f,
+                new Vector3(30.3f, 0.24f, 30.3f), ceramic);
+            Object.DestroyImmediate(roof.GetComponent<Collider>());
+            roof.AddComponent<MeshCollider>().sharedMesh = roof.GetComponent<MeshFilter>().sharedMesh;
+
+            const int wallSegments = 32;
             for (int i = 0; i < wallSegments; i++)
             {
                 float angle = i * (360f / wallSegments);
-                if (angle > 150f && angle < 210f) continue;
-
                 float radians = angle * Mathf.Deg2Rad;
-                Vector3 wallPosition = center + new Vector3(Mathf.Sin(radians) * 14.55f, 0f, Mathf.Cos(radians) * 14.55f);
-                Quaternion wallRotation = Quaternion.Euler(0f, angle, 0f);
-
-                for (int band = 0; band < 6; band++)
-                {
-                    GameObject slat = CreateCube(
-                        "Curved Wall Slat " + i.ToString("00") + "-" + band,
-                        architecture.transform,
-                        wallPosition + Vector3.up * (0.65f + band * 0.86f),
-                        new Vector3(1.88f, band == 0 ? 0.52f : 0.24f, 0.25f),
-                        band % 2 == 0 ? ceramic : concrete);
-                    slat.transform.rotation = wallRotation;
-                }
-
-                if (i % 4 == 0)
-                {
-                    GameObject column = CreateCube(
-                        "Structural Column " + i.ToString("00"),
-                        architecture.transform,
-                        wallPosition * 0.992f + Vector3.up * 3.35f,
-                        new Vector3(0.42f, 6.6f, 0.62f),
-                        concrete);
-                    column.transform.rotation = wallRotation;
-                    column.transform.localRotation *= Quaternion.Euler(0f, 0f, i % 8 == 0 ? -5f : 5f);
-                }
+                Vector3 radial = new Vector3(Mathf.Sin(radians), 0f, Mathf.Cos(radians));
+                Vector3 wall = center + radial * 14.55f;
+                Quaternion rotation = Quaternion.Euler(0f, angle, 0f);
+                CreateCube("Perimeter wall " + (i + 1).ToString("00"), architecture.transform,
+                    wall + Vector3.up * 3.88f, new Vector3(2.98f, 7.9f, 0.36f), i % 4 == 0 ? concrete : ceramic)
+                    .transform.rotation = rotation;
+                CreateCube("Wall base", architecture.transform, wall - radial * 0.24f + Vector3.up * 0.19f,
+                    new Vector3(2.89f, 0.38f, 0.16f), dark).transform.rotation = rotation;
+                CreateCube("Timber wall rail", architecture.transform, wall - radial * 0.23f + Vector3.up * 1.12f,
+                    new Vector3(2.89f, 0.09f, 0.14f), wood).transform.rotation = rotation;
             }
+
+            var diffuser = CreateCylinder("Canopy light diffuser", architecture.transform, center + Vector3.up * 7.55f,
+                new Vector3(8.6f, 0.06f, 8.6f), EmissiveMaterial("Ceiling Diffuser", new Color(0.94f, 0.87f, 0.72f), 0.27f));
+            Object.DestroyImmediate(diffuser.GetComponent<Collider>());
 
             for (int i = 0; i < 24; i++)
             {
@@ -207,28 +206,61 @@ namespace First180.Editor
                 rim.transform.rotation = Quaternion.Euler(0f, angle, 0f);
             }
 
-            for (int i = 0; i < 36; i++)
-            {
-                float angle = i * 10f;
-                if (angle > 145f && angle < 215f) continue;
-                float radians = angle * Mathf.Deg2Rad;
-                Vector3 railPosition = center + new Vector3(Mathf.Sin(radians) * 12.65f, 4.75f, Mathf.Cos(radians) * 12.65f);
-                GameObject rail = CreateCube("Upper Gallery Rail " + i.ToString("00"), architecture.transform, railPosition, new Vector3(2.05f, 0.12f, 0.14f), metal);
-                rail.transform.rotation = Quaternion.Euler(0f, angle, 0f);
-                GameObject lowerRail = CreateCube("Upper Gallery Fascia " + i.ToString("00"), architecture.transform, railPosition + Vector3.down * 0.72f, new Vector3(2.05f, 0.22f, 0.38f), ceramic);
-                lowerRail.transform.rotation = Quaternion.Euler(0f, angle, 0f);
-            }
+            Color lettering = new Color32(214, 235, 232, 255);
+            CreatePulseSign("Gallery Title", architecture.transform, new Vector3(0f, 6.82f, 17.6f), .88f);
+            CreateText("Gallery Subtitle", architecture.transform, "FIRST AID IN VR", new Vector3(0f, 6.13f, 17.55f), 0.24f, lettering, FontStyle.Bold);
+        }
 
-            for (int step = 0; step < 10; step++)
-            {
-                Vector3 stepPosition = new Vector3(-8.8f - step * 0.26f, 0.18f + step * 0.38f, 6.0f + step * 0.48f);
-                GameObject stair = CreateCube("Floating Stair " + (step + 1).ToString("00"), architecture.transform, stepPosition, new Vector3(3.5f, 0.20f, 0.82f), ceramic);
-                stair.transform.rotation = Quaternion.Euler(0f, -28f, 0f);
-            }
+        private static void BuildClinicalWayfinding(Transform parent, Material ceramic, Material panel, Material accent)
+        {
+            var signage = new GameObject("05 - Clinical wayfinding");
+            signage.transform.SetParent(parent, false);
+            var header = new GameObject("Welcome sign");
+            header.transform.SetParent(signage.transform, false);
+            header.transform.localPosition = new Vector3(0f, 2.85f, -9.96f);
+            header.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            CreateCubeLocal("Sign back", header.transform, Vector3.zero, new Vector3(5.8f, 1.48f, 0.12f), panel);
+            CreatePulseSign("Centre name", header.transform, new Vector3(0f, .28f, -.07f), .54f);
+            CreateTextLocal("Training instruction", header.transform, "Choose one of five emergency response scenarios",
+                new Vector3(0f, -0.27f, -0.07f), 0.16f, White, FontStyle.Normal);
 
-            CreateText("Gallery Title", architecture.transform, "FIRST//180", new Vector3(0f, 6.82f, 17.6f), 0.62f, new Color(0.08f, 0.11f, 0.13f), FontStyle.Bold);
-            CreateText("Gallery Subtitle", architecture.transform, "IMMERSIVE EMERGENCY RESPONSE GALLERY", new Vector3(0f, 6.38f, 17.55f), 0.16f, Cyan, FontStyle.Bold);
-            CreateText("Entry Instruction", architecture.transform, "SELECT A TRAINING SCENARIO", new Vector3(0f, 0.16f, -5.6f), 0.19f, new Color(0.72f, 0.78f, 0.8f), FontStyle.Bold, new Vector3(90f, 0f, 0f));
+            var planterSign = new GameObject("Simulation centre plaque");
+            planterSign.transform.SetParent(signage.transform, false);
+            planterSign.transform.localPosition = new Vector3(0f, 0.57f, 1.01f);
+            CreateCubeLocal("Plaque and mount", planterSign.transform, Vector3.zero, new Vector3(2.05f, 0.63f, 0.12f), panel);
+            CreatePulseSign("Planter PULSE plaque", planterSign.transform, new Vector3(0f, .085f, -.075f), .34f);
+            CreateTextLocal("Scenario gallery", planterSign.transform, "SCENARIOS 01-05",
+                new Vector3(0f, -0.115f, -0.07f), 0.115f, White, FontStyle.Normal);
+
+            CreateClinicalStation(signage.transform, new Vector3(-8.9f, 0f, -5.4f), -137f, "SCENARIOS 01-03",
+                "Anaphylaxis  /  Choking  /  Severe bleeding", panel, accent, ceramic);
+            CreateClinicalStation(signage.transform, new Vector3(8.9f, 0f, -5.4f), 137f, "SCENARIOS 03-05",
+                "Severe bleeding  /  Limb loss  /  Frostbite", panel, accent, ceramic);
+        }
+
+        private static void CreateClinicalStation(Transform parent, Vector3 position, float yaw, string title, string detail,
+            Material panel, Material accent, Material ceramic)
+        {
+            var station = new GameObject(title);
+            station.transform.SetParent(parent, false);
+            station.transform.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));
+
+            CreateCubeLocal("Directory panel", station.transform, new Vector3(0f, 2.23f, 0f), new Vector3(4.1f, 1.04f, 0.16f), panel);
+            CreateCubeLocal("Directory column", station.transform, new Vector3(0f, 1.08f, 0.06f), new Vector3(0.36f, 2.12f, 0.23f), panel);
+            CreateCubeLocal("Directory trim", station.transform, new Vector3(0f, 2.73f, -0.09f), new Vector3(4.1f, 0.045f, 0.025f), accent);
+            CreateTextLocal("Directory heading", station.transform, title, new Vector3(0f, 2.39f, -0.1f), 0.23f, Color.white, FontStyle.Bold);
+            CreateTextLocal("Directory destinations", station.transform, detail, new Vector3(0f, 2.04f, -0.1f), 0.145f, White, FontStyle.Normal);
+
+            CreateCubeLocal("Training supply cabinet", station.transform, new Vector3(0f, 0.65f, 0f),
+                new Vector3(1.65f, 1.3f, 0.49f), ceramic);
+            CreateCubeLocal("Cabinet label plate", station.transform, new Vector3(0f, 0.81f, -0.255f),
+                new Vector3(1.42f, 0.51f, 0.025f), panel);
+            CreateCubeLocal("First aid cross vertical", station.transform, new Vector3(-0.49f, 0.89f, -0.28f),
+                new Vector3(0.065f, 0.23f, 0.015f), ceramic);
+            CreateCubeLocal("First aid cross horizontal", station.transform, new Vector3(-0.49f, 0.89f, -0.28f),
+                new Vector3(0.23f, 0.065f, 0.015f), ceramic);
+            CreateTextLocal("Cabinet label", station.transform, "FIRST AID\nTRAINING SUPPLIES",
+                new Vector3(0.15f, 0.81f, -0.28f), 0.09f, Color.white, FontStyle.Bold);
         }
 
         private static void BuildCentralSculpture(
@@ -244,16 +276,16 @@ namespace First180.Editor
             sculpture.transform.SetParent(parent);
             Vector3 treeCenter = new Vector3(0f, 0f, 3.75f);
 
-            CreateCylinder("Tree Well", sculpture.transform, treeCenter + new Vector3(0f, 0.16f, 0f), new Vector3(2.3f, 0.18f, 2.3f), metal);
-            CreateCylinder("Soil Bed", sculpture.transform, treeCenter + new Vector3(0f, 0.36f, 0f), new Vector3(1.92f, 0.08f, 1.92f), concrete);
+            CreateCylinder("Tree Well", sculpture.transform, treeCenter + new Vector3(0f, 0.16f, 0f), new Vector3(5.5f, 0.18f, 5.5f), metal);
+            CreateCylinder("Soil Bed", sculpture.transform, treeCenter + new Vector3(0f, 0.36f, 0f), new Vector3(4.95f, 0.08f, 4.95f), concrete);
 
-            for (int i = 0; i < 11; i++)
+            for (int i = 0; i < 3; i++)
             {
-                float angle = 196f + i * 14.8f;
+                float angle = i == 1 ? 0f : 130f + i * 50f;
                 float radians = angle * Mathf.Deg2Rad;
-                float radius = 3.0f + (i % 2) * 0.25f;
+                const float radius = 3.65f;
                 Vector3 benchPosition = treeCenter + new Vector3(Mathf.Sin(radians) * radius, 0.48f, Mathf.Cos(radians) * radius);
-                GameObject bench = CreateCube("Radial Bench " + (i + 1).ToString("00"), sculpture.transform, benchPosition, new Vector3(1.55f, 0.18f, 0.72f), ceramic);
+                GameObject bench = CreateCube("Radial Bench " + (i + 1).ToString("00"), sculpture.transform, benchPosition, new Vector3(1.92f, 0.18f, 0.76f), ceramic);
                 bench.transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
                 Vector3 supportPosition = treeCenter + new Vector3(Mathf.Sin(radians) * (radius - 0.18f), 0.26f, Mathf.Cos(radians) * (radius - 0.18f));
@@ -261,9 +293,12 @@ namespace First180.Editor
                 support.transform.rotation = Quaternion.Euler(0f, angle, 0f);
             }
 
+            var tree = new GameObject("Tree canopy and trunk");
+            tree.transform.SetParent(sculpture.transform, false);
+            tree.transform.position = treeCenter;
             Vector3 trunkBase = treeCenter + Vector3.up * 0.38f;
             Vector3 trunkFork = treeCenter + new Vector3(0f, 3.55f, 0f);
-            CreateBeam("Main Trunk", sculpture.transform, trunkBase, trunkFork, 0.28f, trunk);
+            CreateBeam("Main Trunk", tree.transform, trunkBase, trunkFork, 0.46f, trunk);
 
             Vector3[] crownPoints =
             {
@@ -280,8 +315,8 @@ namespace First180.Editor
             for (int i = 0; i < crownPoints.Length; i++)
             {
                 Vector3 joint = trunkFork + new Vector3((i % 3 - 1) * 0.16f, (i % 2) * 0.18f, (i % 4 - 1.5f) * 0.08f);
-                CreateBeam("Primary Branch " + (i + 1).ToString("00"), sculpture.transform, joint, crownPoints[i], 0.10f, trunk);
-                CreateBeam("Secondary Branch " + (i + 1).ToString("00"), sculpture.transform, crownPoints[i], crownPoints[i] + new Vector3((i % 2 == 0 ? -0.7f : 0.7f), 0.35f, (i % 3 - 1) * 0.45f), 0.055f, trunk);
+                CreateBeam("Primary Branch " + (i + 1).ToString("00"), tree.transform, joint, crownPoints[i], 0.10f, trunk);
+                CreateBeam("Secondary Branch " + (i + 1).ToString("00"), tree.transform, crownPoints[i], crownPoints[i] + new Vector3((i % 2 == 0 ? -0.7f : 0.7f), 0.35f, (i % 3 - 1) * 0.45f), 0.055f, trunk);
             }
 
             for (int i = 0; i < 112; i++)
@@ -292,12 +327,14 @@ namespace First180.Editor
                 float x = Mathf.Cos(angle) * radius;
                 float z = Mathf.Sin(angle) * radius * 0.68f;
                 float y = 4.48f + (i % 13) * 0.13f + Mathf.Sin(angle * 1.7f) * 0.2f;
-                Vector3 leafScale = new Vector3(0.42f + (i % 4) * 0.11f, 0.12f + (i % 3) * 0.04f, 0.25f + (i % 5) * 0.048f);
-                GameObject leaf = CreateSphere("Amber Leaf Cluster " + (i + 1).ToString("00"), sculpture.transform, treeCenter + new Vector3(x, y, z), leafScale, foliage);
+                Vector3 leafScale = new Vector3(0.59f + (i % 4) * 0.15f, 0.19f + (i % 3) * 0.056f, 0.40f + (i % 5) * 0.06f);
+                GameObject leaf = CreateSphere("Amber Leaf Cluster " + (i + 1).ToString("00"), tree.transform, treeCenter + new Vector3(x, y, z), leafScale, foliage);
                 leaf.transform.rotation = Quaternion.Euler((i * 13f) % 35f, (i * 47f) % 360f, (i * 7f) % 25f);
             }
 
-            CreateText("Tree Caption", sculpture.transform, "RESPONSE GARDEN", treeCenter + new Vector3(0f, 0.86f, -3.05f), 0.18f, Cyan, FontStyle.Bold);
+            tree.transform.localScale = new Vector3(1.38f, 1.14f, 1.56f);
+            foreach (var collider in tree.GetComponentsInChildren<Collider>())
+                Object.DestroyImmediate(collider);
         }
 
         private static void BuildScenarioGallery(Transform parent, Material ceramic, Material metal, Material panel)
@@ -357,8 +394,9 @@ namespace First180.Editor
             CreateCubeLocal("Glass Face", exhibit.transform, new Vector3(0f, 2.75f, -0.18f), new Vector3(2.56f, 4.10f, 0.045f), panel);
             CreateCubeLocal("Accent Header", exhibit.transform, new Vector3(0f, 4.88f, -0.27f), new Vector3(2.55f, 0.06f, 0.06f), accent);
             CreateCubeLocal("Accent Foot", exhibit.transform, new Vector3(0f, 0.68f, -0.27f), new Vector3(2.55f, 0.04f, 0.06f), accent);
-            CreateCubeLocal("Exhibit Plinth", exhibit.transform, new Vector3(0f, 0.14f, -0.5f), new Vector3(3.8f, 0.26f, 1.45f), ceramic);
-            CreateCubeLocal("Floor Marker", exhibit.transform, new Vector3(0f, 0.30f, -1.35f), new Vector3(2.25f, 0.025f, 1.15f), accent);
+            CreateCubeLocal("Exhibit Plinth", exhibit.transform, new Vector3(0f, 0.08f, 0.22f), new Vector3(3.8f, 0.16f, 0.7f), ceramic);
+            Object.DestroyImmediate(CreateCubeLocal("Entry threshold", exhibit.transform, new Vector3(0f, 0.012f, -1.45f),
+                new Vector3(2.45f, 0.012f, 0.08f), accent).GetComponent<Collider>());
 
             CreateTextLocal("Module Number", exhibit.transform, "MODULE " + number.ToString("00"), new Vector3(0f, 4.52f, -0.245f), 0.15f, accentColor, FontStyle.Bold);
             CreateTextLocal("Scenario Symbol", exhibit.transform, symbol, new Vector3(0f, 3.62f, -0.25f), 0.62f, accentColor, FontStyle.Bold);
@@ -368,7 +406,7 @@ namespace First180.Editor
 
             Vector3 lightPosition = exhibit.transform.TransformPoint(new Vector3(0f, 5.25f, -2.1f));
             Vector3 lightTarget = exhibit.transform.TransformPoint(new Vector3(0f, 2.2f, -0.25f));
-            AddSpotLight(exhibit.transform, "Exhibit Light", lightPosition, lightTarget, accentColor, 5.1f, 8.5f, 42f);
+            AddSpotLight(exhibit.transform, "Exhibit Light", lightPosition, lightTarget, new Color(0.83f, 0.92f, 1f), 0.92f, 8.5f, 42f);
         }
 
         private static void BuildLighting(Transform parent)
@@ -376,28 +414,27 @@ namespace First180.Editor
             GameObject lighting = new GameObject("04 - Architectural Lighting");
             lighting.transform.SetParent(parent);
 
-            GameObject sunObject = new GameObject("Oculus Sunlight");
+            GameObject sunObject = new GameObject("Diffuse ceiling fill");
             sunObject.transform.SetParent(lighting.transform);
-            sunObject.transform.rotation = Quaternion.Euler(48f, -32f, 0f);
+            sunObject.transform.rotation = Quaternion.Euler(54f, -32f, 0f);
             Light sun = sunObject.AddComponent<Light>();
             sun.type = LightType.Directional;
             sun.color = new Color(1f, 0.88f, 0.71f);
-            sun.intensity = 1.18f;
-            sun.shadows = LightShadows.Soft;
-            sun.shadowStrength = 0.76f;
+            sun.intensity = 0.48f;
+            sun.shadows = LightShadows.None;
 
-            AddPointLight(lighting.transform, "Oculus Bounce", new Vector3(0f, 6.8f, 4f), new Color(1f, 0.73f, 0.42f), 7.5f, 13f, true);
-            AddPointLight(lighting.transform, "Entry Fill", new Vector3(0f, 4.1f, -8f), new Color(0.58f, 0.78f, 0.9f), 4.5f, 15f, false);
-            AddPointLight(lighting.transform, "Left Gallery Fill", new Vector3(-9f, 4.2f, 6f), new Color(0.73f, 0.82f, 0.88f), 3.8f, 12f, false);
-            AddPointLight(lighting.transform, "Right Gallery Fill", new Vector3(9f, 4.2f, 6f), new Color(0.73f, 0.82f, 0.88f), 3.8f, 12f, false);
-            AddPointLight(lighting.transform, "Rear Gallery Fill", new Vector3(0f, 5.0f, 14f), new Color(0.76f, 0.86f, 0.94f), 4.2f, 11f, false);
+            AddPointLight(lighting.transform, "Oculus Bounce", new Vector3(0f, 6.8f, 4f), new Color(1f, 0.82f, 0.55f), 1.6f, 10f, true);
+            AddPointLight(lighting.transform, "Entry Fill", new Vector3(0f, 4.1f, -8f), new Color(0.58f, 0.78f, 0.9f), 1.18f, 15f, false);
+            AddPointLight(lighting.transform, "Left Gallery Fill", new Vector3(-9f, 4.2f, 6f), new Color(0.73f, 0.82f, 0.88f), 0.95f, 12f, false);
+            AddPointLight(lighting.transform, "Right Gallery Fill", new Vector3(9f, 4.2f, 6f), new Color(0.73f, 0.82f, 0.88f), 0.95f, 12f, false);
+            AddPointLight(lighting.transform, "Rear Gallery Fill", new Vector3(0f, 5.0f, 14f), new Color(0.76f, 0.86f, 0.94f), 0.85f, 11f, false);
 
             for (int i = 0; i < 8; i++)
             {
                 float angle = i * 45f + 22.5f;
                 float radians = angle * Mathf.Deg2Rad;
                 Vector3 position = new Vector3(Mathf.Sin(radians) * 8.3f, 6.7f, 4f + Mathf.Cos(radians) * 8.3f);
-                AddSpotLight(lighting.transform, "Ceiling Wash " + (i + 1).ToString("00"), position, position + Vector3.down * 6f, new Color(0.87f, 0.91f, 0.93f), 3.6f, 10f, 54f);
+                AddSpotLight(lighting.transform, "Ceiling Wash " + (i + 1).ToString("00"), position, position + Vector3.down * 6f, new Color(0.87f, 0.91f, 0.93f), 0.9f, 10f, 54f);
             }
 
             GameObject probeObject = new GameObject("Gallery Reflection Probe");
@@ -414,8 +451,8 @@ namespace First180.Editor
         {
             GameObject cameraObject = new GameObject("Lobby Preview Camera");
             cameraObject.transform.SetParent(parent);
-            cameraObject.transform.position = new Vector3(0f, 2.25f, -13.2f);
-            cameraObject.transform.LookAt(new Vector3(0f, 3.0f, 5.55f));
+            cameraObject.transform.position = new Vector3(-4.5f, 2.62f, -7.1f);
+            cameraObject.transform.LookAt(new Vector3(0.5f, 3.36f, 7.8f));
 
             Camera camera = cameraObject.AddComponent<Camera>();
             camera.fieldOfView = 68f;
@@ -473,7 +510,7 @@ namespace First180.Editor
                 CreateCube("Right Panel Light " + (i + 1), architecture.transform, new Vector3(14.61f, 4.8f, z), new Vector3(0.04f, 0.08f, 1.8f), cyan);
             }
 
-            CreateText("Main Title", architecture.transform, "FIRST//180", new Vector3(0f, 6.35f, 13.82f), 1.0f, Color.white, FontStyle.Bold);
+            CreatePulseSign("Main Title", architecture.transform, new Vector3(0f, 6.35f, 13.82f), 1f);
             CreateText("Lobby Instruction", architecture.transform, "SELECT A TRAINING SCENARIO", new Vector3(0f, 5.25f, 13.8f), 0.36f, Cyan, FontStyle.Bold);
             CreateText("Prototype Label", architecture.transform, "LOBBY PROTOTYPE  |  SCENARIO LOGIC COMING NEXT", new Vector3(0f, 0.22f, -10.6f), 0.19f, SoftWhite, FontStyle.Normal, new Vector3(90f, 0f, 0f));
         }
@@ -703,6 +740,20 @@ namespace First180.Editor
             return go;
         }
 
+        private static void CreatePulseSign(string name, Transform parent, Vector3 position, float height)
+        {
+            var sign = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            sign.name = name;
+            sign.transform.SetParent(parent, false);
+            sign.transform.localPosition = position;
+            sign.transform.localScale = new Vector3(height * 3.6f, height, 1f);
+            UnityEngine.Object.DestroyImmediate(sign.GetComponent<Collider>());
+            var renderer = sign.GetComponent<MeshRenderer>();
+            renderer.sharedMaterial = Resources.Load<Material>("PulseSign");
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+        }
+
         private static GameObject CreateTextLocal(
             string name,
             Transform parent,
@@ -772,7 +823,7 @@ namespace First180.Editor
             light.intensity = intensity;
             light.range = range;
             light.spotAngle = spotAngle;
-            light.shadows = LightShadows.Soft;
+            light.shadows = LightShadows.None;
         }
 
         private static GameObject CreateCube(string name, Transform parent, Vector3 position, Vector3 scale, Material material)

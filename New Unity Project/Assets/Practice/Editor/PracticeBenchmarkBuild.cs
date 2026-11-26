@@ -9,14 +9,14 @@ namespace First180.Practice.Editor
 {
     public static class PracticeBenchmarkBuild
     {
-        [MenuItem("FIRST180 Practice/Diagnostics/Build Windows frame benchmark")]
+        [MenuItem("PULSE/Diagnostics/Build Windows frame benchmark")]
         public static void Build()
         {
             string folder = Path.Combine(Path.GetTempPath(), "FIRST180-PracticeBenchmark");
             BuildWindows(Path.Combine(folder,"FIRST180-Benchmark.exe"), true);
         }
 
-        [MenuItem("FIRST180 Practice/Build Windows practice player")]
+        [MenuItem("PULSE/Build Windows practice player")]
         public static void BuildRelease()
         {
             var repository = Directory.GetParent(Application.dataPath).Parent.FullName;

@@ -10,7 +10,7 @@ namespace First180.Practice.Editor
     public static class PracticeEnvironmentArt
     {
         const string Shared = "Assets/Practice/Art/Shared/";
-        [MenuItem("FIRST180 Practice/Environment/Apply art to open scenario")]
+        [MenuItem("PULSE/Environment/Apply art to open scenario")]
         public static void Apply()
         {
             Scene scene = SceneManager.GetActiveScene();
@@ -25,6 +25,7 @@ namespace First180.Practice.Editor
                 case 2: case 3: FieldArt.Apply(room, art.transform); break;
                 case 4: AlpineArt.Apply(room, art.transform); break;
             }
+            ScenarioBayArchitecture.Apply(room, art.transform);
             ApplyShared(room, art, scene);
         }
 

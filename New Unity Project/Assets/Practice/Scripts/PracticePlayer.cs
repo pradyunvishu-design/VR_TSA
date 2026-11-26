@@ -75,7 +75,7 @@ namespace First180.Practice
                 var button=hit.collider.GetComponentInParent<SpatialButton>();
                 if(button && (click || Input.GetKeyDown(KeyCode.E)))button.Invoke();
                 var portal=hit.collider.GetComponentInParent<PracticePortal>();
-                if(portal!=null)
+                if (portal && portal.CanSelect(hit.distance))
                 {
                     targetLabel="E / click: "+portal.label;
                     if(click || Input.GetKeyDown(KeyCode.E)) portal.Use();

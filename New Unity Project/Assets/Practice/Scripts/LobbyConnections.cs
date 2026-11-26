@@ -5,15 +5,22 @@ using UnityEngine.SceneManagement;
 
 namespace First180.Practice
 {
-    // The authored lobby stays untouched: connections exist only in the loaded runtime scene.
+    // Connect the authored exhibits to the practice session after the additive load.
     public class LobbyConnections : MonoBehaviour
     {
         public bool Ready { get; private set; }
         void Awake() { PracticeSession.Get().loadingHub=this; }
         public IEnumerator Start()
         {
-            yield return SceneManager.LoadSceneAsync("FIRST180_Lobby", LoadSceneMode.Additive);
-            var lobby=SceneManager.GetSceneByName("FIRST180_Lobby");
+            const string lobbyName = "FIRST180_Lobby";
+            if (!Application.CanStreamedLevelBeLoaded(lobbyName))
+            {
+                Debug.LogError("FIRST180_Lobby is unavailable. The training menu can still open scenarios.");
+                Ready = true;
+                yield break;
+            }
+            yield return SceneManager.LoadSceneAsync(lobbyName, LoadSceneMode.Additive);
+            var lobby=SceneManager.GetSceneByName(lobbyName);
             var signs=new List<TextMesh>();
             foreach(var root in lobby.GetRootGameObjects())
             {
@@ -23,12 +30,12 @@ namespace First180.Practice
                 foreach(var t in root.GetComponentsInChildren<Transform>(true))
                 {
                     FitGallerySurface(t);
-                    for(int i=0;i<5;i++)
+                    for(int i=0;i<ScenarioCatalog.All.Length;i++)
                     {
                         string prefix=(i+1).ToString("00")+" - ";
-                        if(!t.name.StartsWith(prefix) || !t.name.Contains(ScenarioCatalog.All[i].title.ToUpper())) continue;
+                        if(!t.name.StartsWith(prefix) || !t.name.Contains(ScenarioCatalog.All[i].title.ToUpperInvariant())) continue;
                         var p=t.gameObject.AddComponent<PracticePortal>();p.scenarioId=i;p.label=ScenarioCatalog.All[i].title;
-                        foreach(var text in t.GetComponentsInChildren<TextMesh>())if(text.name=="Offline Label")text.text="APPROACH OR SELECT TO ENTER";
+                        foreach(var text in t.GetComponentsInChildren<TextMesh>())if(text.name=="Offline Label")text.text="WALK UP OR SELECT";
                         AddLocationView(t, ScenarioCatalog.All[i]);
                         var entrance=new GameObject("Runtime entrance / "+p.label);
                         entrance.transform.SetParent(t,false);entrance.transform.localPosition=new Vector3(0,1.2f,-0.8f);

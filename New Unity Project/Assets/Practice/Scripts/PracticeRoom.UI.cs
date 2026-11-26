@@ -9,7 +9,8 @@ namespace First180.Practice
         GUIStyle titleStyle, textStyle, smallStyle, buttonStyle, statStyle;
         readonly List<Rect> drawnPanels = new List<Rect>(8);
         readonly Texture2D[] buttonFills = new Texture2D[3];
-        GUIStyle hintStyle;
+        GUIStyle hintStyle, panelCaption;
+        Texture2D pulseWordmark;
         static float HudScale => Mathf.Max(.01f, Mathf.Min(Screen.width / 1600f, Screen.height / 900f));
         static float HudLeft => (Screen.width - 1600f * HudScale) * .5f;
         static float HudHeight => Screen.height / HudScale;
@@ -20,9 +21,12 @@ namespace First180.Practice
         void Styles()
         {
             if(titleStyle!=null) return;
+            pulseWordmark=Resources.Load<Texture2D>("PulseWordmark");
             titleStyle=new GUIStyle(GUI.skin.label){fontSize=28,fontStyle=FontStyle.Bold,wordWrap=true};titleStyle.normal.textColor=Color.white;
             textStyle=new GUIStyle(GUI.skin.label){fontSize=19,wordWrap=true};textStyle.normal.textColor=new Color(0.86f,0.91f,0.95f);
             smallStyle=new GUIStyle(textStyle){fontSize=17};
+            panelCaption=new GUIStyle(smallStyle){fontStyle=FontStyle.Bold,wordWrap=false};
+            panelCaption.normal.textColor=accent;
             hintStyle=new GUIStyle(smallStyle){alignment=TextAnchor.MiddleCenter, wordWrap=false};
             statStyle=new GUIStyle(titleStyle){fontSize=42};statStyle.normal.textColor=accent;
             buttonStyle=new GUIStyle(GUI.skin.button){fontSize=19,alignment=TextAnchor.MiddleLeft,wordWrap=true,border=new RectOffset(),padding=new RectOffset(15,12,3,3)};
@@ -85,7 +89,7 @@ namespace First180.Practice
             float width=Screen.width/HudScale;
             float left=(1600-width)*.5f;
             Panel(new Rect(left,0,width,74));
-            Label(28,14,215,42,"FIRST / 180",titleStyle);
+            GUI.DrawTexture(new Rect(28,12,180,50),pulseWordmark,ScaleMode.ScaleToFit);
             string mode=session.dashboard?"CERTIFICATION RESULTS":scenarioId<0?"TRAINING HUB":
                 session.certification?"CERTIFICATION   /   CASE "+(session.round+1)+" OF 5":"TRAINING   /   "+Definition.title.ToUpperInvariant();
             Label(254,21,980,35,mode);
@@ -96,8 +100,8 @@ namespace First180.Practice
             Panel(new Rect(left,footer,width,60));
             string look=desktopPlayer && desktopPlayer.MouseLookActive?"Mouse   Look    Tab   Menu cursor":"Click floor or Tab   Mouse look";
             string controls=modal?"Personal practice simulation. Times and scores are for this exercise.":
-                look+"     Middle-drag   Sidestep     WASD / arrows   Move     "+
-                (scenarioId<0?"E / click   Enter":"E   Inspect / pick up     F   Use     Q   Return tool")+"     Esc   Pause";
+                look+"     Middle-drag   Sidestep     WASD   Move     Left / Right   Turn     "+
+                (scenarioId<0?"Walk up or E / click   Enter":"E   Inspect / pick up     F   Use     Q   Return tool")+"     Esc   Pause";
             Label(28,footer+15,1540,32,controls,smallStyle);
             if(session.loading)
             {
@@ -128,7 +132,7 @@ namespace First180.Practice
         {
             Panel(new Rect(1150,103,430,690));
             Label(1173,125,375,45,"Training scenarios",titleStyle);
-            Label(1173,174,375,65,"Choose a case here or enter its window in the gallery.");
+            Label(1173,174,375,65,"Choose a case here or walk up to its exhibit in the gallery.");
             for(int i=0;i<5;i++)
             {
                 float y=250+i*65;
@@ -151,58 +155,78 @@ namespace First180.Practice
             Label(48,152,389,27,EmergencyActive?"INCIDENT ACTIVE" : "OBSERVATION",smallStyle);
             if(result!=null) { DrawResult();return; }
             Panel(new Rect(1150,103,430,EmergencyActive?690:218));
-            Label(1173,119,380,45,session.certification?"ASSESS & RESPOND":"TRAINING TASK",titleStyle);
+            Fill(new Rect(1150,103,430,3),accent);
             if(!EmergencyActive)
             {
-                Label(1173,181,376,121,Definition.normal);
-
+                Label(1173,120,375,31,"LOCATION BRIEF",panelCaption);
+                Label(1173,168,375,130,Definition.normal);
                 return;
             }
-            if(session.certification) Label(1173,169,375,32,"Elapsed "+elapsed.ToString("0.0")+"s  /  Limit "+Definition.timeLimit+"s",smallStyle);
-            else Label(1173,169,375,32,"Attempt errors: "+encounter.Mistakes+"  •  Perfect run required",smallStyle);
+
+            Label(1173,118,380,30,PatientPanelIdentity,panelCaption);
+            string phase=encounter.SelectedPatient<0?"Patient assessment":
+                encounter.DiagnosedAs<0?"Identify the condition":"Patient care";
+            Label(1173,151,385,47,phase,titleStyle);
+            string readout=session.certification
+                ?"Elapsed "+elapsed.ToString("0")+" s   /   Limit "+Definition.timeLimit+" s"
+                :"Training   /   "+encounter.Mistakes+(encounter.Mistakes==1?" error":" errors");
+            Label(1173,199,375,34,readout,smallStyle);
+            Fill(new Rect(1173,242,382,1),new Color(.2f,.35f,.39f));
+
             if(encounter.SelectedPatient<0)
             {
-                Label(1173,210,375,55,session.certification?"Choose the patient to treat first.":"Inspect each person. Prioritize the most urgent condition.");
                 for(int slot=0;slot<3;slot++)
                 {
                     int patient=PatientInSlot(slot);
-                    if(Button(1173,272+slot*44,375,38,"Inspect patient "+patientLabels[patient])) Inspect(patient);
+                    float y=259+slot*49;
+                    if(Button(1173,y,382,42,"Inspect patient "+patientLabels[patient])) Inspect(patient);
+                    if(inspected==patient) Fill(new Rect(1173,y,4,42),accent);
                 }
-                Label(1173,413,375,169,observation==""?"Click a patient in the room to see their condition.":observation);
+                Label(1173,419,375,30,"FINDINGS",panelCaption);
+                Label(1173,457,380,126,inspected<0?"Select a patient to record your observations.":observation);
                 GUI.enabled=inspected>=0;
-                if(Button(1173,603,375,54,"Treat inspected patient first")) ChoosePatient(inspected);
+                if(Button(1173,604,382,54,inspected<0?"Choose a patient first":"Prioritize patient "+patientLabels[inspected])) ChoosePatient(inspected);
                 GUI.enabled=true;
             }
             else if(encounter.DiagnosedAs<0)
             {
-                Label(1173,210,375,125,observation);
-                for(int i=0;i<5;i++) if(Button(1173,350+i*54,375,46,ScenarioCatalog.All[i].title)) Diagnose(i);
+                Label(1173,257,375,30,"FINDINGS",panelCaption);
+                Label(1173,296,380,115,observation);
+                for(int i=0;i<5;i++) if(Button(1173,424+i*51,382,45,ScenarioCatalog.All[i].title)) Diagnose(i);
             }
             else
             {
-                if(showingReassessment)
-                {
-                    Label(1173,210,375,35,"Patient "+patientLabels[encounter.SelectedPatient]+"   /   Reassessment",smallStyle);
-                    Label(1173,252,375,144,observation);
-                }
-                else if(!session.certification)
-                {
-                    Label(1173,210,375,143,Definition.instructions[Mathf.Min(encounter.Step,Definition.instructions.Length-1)]);
-                    Label(1173,355,375,48,"NEXT: "+ScenarioCatalog.Label(Definition.actions[Mathf.Min(encounter.Step,Definition.actions.Length-1)]),smallStyle);
-                }
-                else Label(1173,210,375,105,"Choose equipment in the room. Decisions are recorded. Evaluation follows all five cases.");
+                string heading=showingReassessment?"REASSESSMENT":session.certification?"CASE RECORD":TrainingStepLabel;
+                Label(1173,257,375,30,heading,panelCaption);
+                string detail=showingReassessment?observation:session.certification?"Your actions are being recorded.":CurrentTrainingInstruction;
+                Label(1173,301,380,130,detail);
+                Fill(new Rect(1173,448,382,1),new Color(.2f,.35f,.39f));
+                Label(1173,463,375,30,"EQUIPMENT",panelCaption);
                 var care=GetComponent<TreatmentManager>();
-                Label(1173,405,375,142,care?care.status:"Equipment system loading...");
-
-                if(Button(1173,610,375,40,showingReassessment?"Back to task":"Reassess patient"))
+                Label(1173,501,380,95,care?care.status:"Loading equipment...");
+                if(Button(1173,610,382,40,showingReassessment?"Back to task":"Reassess patient"))
                 {
                     showingReassessment=!showingReassessment;
                     if(showingReassessment) Inspect(encounter.SelectedPatient);
                 }
-                if(session.certification && Button(1173,655,375,46,"Finish this case / hand over")) Complete();
+                if(session.certification && Button(1173,662,382,46,"Finish this case / hand over")) Complete();
             }
-            if(session.certification) Label(1173,720,375,50,feedback,smallStyle);
+            if(session.certification) Label(1173,724,375,48,feedback,smallStyle);
         }
+
+        // Both displays identify the same person after the clinical roles are shuffled.
+        internal string PatientPanelIdentity
+        {
+            get
+            {
+                int id=encounter.SelectedPatient>=0?encounter.SelectedPatient:inspected;
+                if(id<0) return "PATIENTS  /  3 ON SCENE";
+                return "PATIENT "+patientLabels[id]+(encounter.SelectedPatient>=0?"  /  SELECTED":"  /  INSPECTED");
+            }
+        }
+        internal string TrainingStepLabel => "TRAINING  /  STEP "+(Mathf.Min(encounter.Step,Definition.instructions.Length-1)+1)+" OF "+Definition.instructions.Length;
+        internal string CurrentTrainingInstruction => Definition.instructions[Mathf.Min(encounter.Step,Definition.instructions.Length-1)];
+
         void DrawResult()
         {
             Panel(new Rect(415,220,770,490));

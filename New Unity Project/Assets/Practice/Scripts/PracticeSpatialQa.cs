@@ -43,6 +43,14 @@ namespace First180.Practice
                 check(!care.held,"Modal spatial input blocks world pickup for hand "+index);
             }
             room.BeginEmergency();
+            var audio=room.GetComponents<AudioSource>();
+            check(audio.Where(source=>source.clip).All(source=>
+                    !UnityEditor.AssetDatabase.GetAssetPath(source.clip).Contains("/PracticeVoice/")),
+                  "ROOK instruction dispatch does not assign a voice clip");
+            check(audio.Any(source=>source.clip && source.loop && source.clip.name=="Procedural breathing") &&
+                  audio.Any(source=>source.clip && source.loop &&
+                    UnityEditor.AssetDatabase.GetAssetPath(source.clip).Contains("/LocationSound/")),
+                  "Breathing and room ambience remain configured during caption-only guidance");
             panel.RefreshPanel(true);
             var prioritize=Button(panel,"Prioritize inspected patient");
             check(prioritize && !prioritize.Available,"Spatial triage requires inspection before prioritization");
@@ -52,6 +60,11 @@ namespace First180.Practice
                 if(inspect) rig.ApplyHand(1,rig.rightHand,inspect.GetComponent<Collider>(),1,true,true,false,false,false);
                 check(inspect && room.inspected==room.PatientInSlot(slot) && prioritize && prioritize.Available,
                       "Spatial inspection selects the displayed A/B/C slot "+slot);
+                string expected="PATIENT "+(char)('A'+slot)+"  /  INSPECTED";
+                var labels=panel.GetComponentsInChildren<Text>();
+                check(room.PatientPanelIdentity==expected && labels.Any(label=>label.text==expected)
+                      && room.observation.Length>0 && labels.Any(label=>label.text.Contains(room.observation)),
+                      "Desktop and spatial patient records agree with inspected person and findings: "+(char)('A'+slot));
             }
             room.inspected=-1;
             room.observation="";
@@ -70,6 +83,9 @@ namespace First180.Practice
                 check(next,"Spatial analytics page navigation "+(page+1));
                 if(!next) break;
                 rig.ApplyHand(0,rig.leftHand,next.GetComponent<Collider>(),1,true,true,false,false,true);
+                var logo=panel.GetComponentsInChildren<RawImage>().FirstOrDefault(image=>image.name=="PULSE");
+                check(logo && logo.texture && logo.texture.name=="PulseWordmark" && !logo.raycastTarget,
+                      "PULSE wordmark is visible on the spatial results board and passes through pointer input");
                 var labels=panel.GetComponentsInChildren<Text>();
                 var score=session.results[page];
                 check(labels.Any(t=>t.text==ScenarioCatalog.All[score.scenario].title)

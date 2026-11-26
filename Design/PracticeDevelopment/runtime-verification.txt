@@ -1,14 +1,16 @@
-UTC: 2026-11-25T20:24:31.1824517Z
+UTC: 2026-11-26T17:51:29.5545461Z
 PASS Gallery signs respect depth behind menus and use a valid font atlas
 PASS Gallery walking surface matches shallow visible geometry: Gallery Floor
 PASS Gallery walking surface matches shallow visible geometry: Inset Floor
 PASS Gallery walking surface matches shallow visible geometry: Tree Well
 PASS Gallery walking surface matches shallow visible geometry: Soil Bed
+PASS Gallery perimeter has continuous walls, visible floor and a sealed roof
+PASS The gallery uses a single level without stairs
+PASS World ray selects visible gallery exhibit Frostbite
 PASS World ray selects visible gallery exhibit Obstructed Airways
 PASS World ray selects visible gallery exhibit Anaphylaxis
-PASS World ray selects visible gallery exhibit Frostbite
-PASS World ray selects visible gallery exhibit Lost Limb
 PASS World ray selects visible gallery exhibit Traumatic Hemorrhaging
+PASS World ray selects visible gallery exhibit Lost Limb
 PASS Certification locked without mastery
 PASS Opposite grip keeps the original hand and equipment
 PASS Original hand can return its tool after the other hand tries to grab
@@ -20,10 +22,15 @@ PASS Opaque pause board intercepts hand rays and permits walking
 PASS Pause has a selectable spatial Resume button
 PASS Paused hand 1 selects Resume while still gripping equipment
 PASS Modal spatial input blocks world pickup for hand 1
+PASS ROOK instruction dispatch does not assign a voice clip
+PASS Breathing and room ambience remain configured during caption-only guidance
 PASS Spatial triage requires inspection before prioritization
 PASS Spatial inspection selects the displayed A/B/C slot 0
+PASS Desktop and spatial patient records agree with inspected person and findings: A
 PASS Spatial inspection selects the displayed A/B/C slot 1
+PASS Desktop and spatial patient records agree with inspected person and findings: B
 PASS Spatial inspection selects the displayed A/B/C slot 2
+PASS Desktop and spatial patient records agree with inspected person and findings: C
 PASS Bystander inspection cannot replace selected patient findings during care
 PASS Animated ROOK card shows the placement correction
 PASS Wrong anatomical placement penalized without advancing
@@ -76,6 +83,16 @@ PASS Patient stabilized 4
 PASS Perfect equipment-based training saves transient mastery: 4
 PASS Five100% training results unlock certification
 PASS Certification starts after mastery
+PASS Triage button slots follow visible patient letters in case 2
+PASS Instructor hidden throughout certification case 2
+PASS Certification onset has neutral feedback
+PASS Scene loaded 2
+PASS Equipment and contact target for safety
+PASS Equipment and contact target for call
+PASS Equipment and contact target for pressure
+PASS Equipment and contact target for monitor
+PASS All real treatment handlers finish 2
+PASS Patient stabilized 2
 PASS Triage button slots follow visible patient letters in case 0
 PASS Instructor hidden throughout certification case 0
 PASS Certification onset has neutral feedback
@@ -86,27 +103,17 @@ PASS Equipment and contact target for epinephrine
 PASS Equipment and contact target for monitor
 PASS All real treatment handlers finish 0
 PASS Patient stabilized 0
-PASS Triage button slots follow visible patient letters in case 2
-PASS Instructor hidden throughout certification case 2
+PASS Triage button slots follow visible patient letters in case 4
+PASS Instructor hidden throughout certification case 4
 PASS Certification onset has neutral feedback
-PASS Scene loaded 2
+PASS Scene loaded 4
 PASS Equipment and contact target for safety
 PASS Equipment and contact target for call
-PASS Equipment and contact target for pressure
-PASS Equipment and contact target for tourniquet
+PASS Equipment and contact target for shelter
+PASS Equipment and contact target for protect
 PASS Equipment and contact target for monitor
-PASS All real treatment handlers finish 2
-PASS Patient stabilized 2
-PASS Triage button slots follow visible patient letters in case 1
-PASS Instructor hidden throughout certification case 1
-PASS Certification onset has neutral feedback
-PASS Scene loaded 1
-PASS Equipment and contact target for safety
-PASS Equipment and contact target for call
-PASS Equipment and contact target for backblows
-PASS Equipment and contact target for monitor
-PASS All real treatment handlers finish 1
-PASS Patient stabilized 1
+PASS All real treatment handlers finish 4
+PASS Patient stabilized 4
 PASS Triage button slots follow visible patient letters in case 3
 PASS Instructor hidden throughout certification case 3
 PASS Certification onset has neutral feedback
@@ -119,60 +126,75 @@ PASS Equipment and contact target for preserve
 PASS Equipment and contact target for monitor
 PASS All real treatment handlers finish 3
 PASS Patient stabilized 3
-PASS Triage button slots follow visible patient letters in case 4
-PASS Instructor hidden throughout certification case 4
+PASS Triage button slots follow visible patient letters in case 1
+PASS Instructor hidden throughout certification case 1
 PASS Certification onset has neutral feedback
-PASS Scene loaded 4
+PASS Scene loaded 1
 PASS Equipment and contact target for safety
 PASS Equipment and contact target for call
-PASS Equipment and contact target for shelter
-PASS Equipment and contact target for protect
+PASS Equipment and contact target for backblows
+PASS Equipment and contact target for thrusts
 PASS Equipment and contact target for monitor
-PASS All real treatment handlers finish 4
-PASS Patient stabilized 4
+PASS All real treatment handlers finish 1
+PASS Patient stabilized 1
 PASS Certification visits all5 exactly once
 PASS Final analytics receives five cases
 PASS Perfect certification earns practice CERTIFIED
 PASS Spatial analytics page navigation 1
-PASS Spatial analytics page reports the recorded case and metrics for 0
+PASS PULSE wordmark is visible on the spatial results board and passes through pointer input
+PASS Spatial analytics page reports the recorded case and metrics for 2
 PASS Spatial page has bounded, fit-to-width text 1
 PASS Spatial analytics page navigation 2
-PASS Spatial analytics page reports the recorded case and metrics for 2
+PASS PULSE wordmark is visible on the spatial results board and passes through pointer input
+PASS Spatial analytics page reports the recorded case and metrics for 0
 PASS Spatial page has bounded, fit-to-width text 2
 PASS Spatial analytics page navigation 3
-PASS Spatial analytics page reports the recorded case and metrics for 1
+PASS PULSE wordmark is visible on the spatial results board and passes through pointer input
+PASS Spatial analytics page reports the recorded case and metrics for 4
 PASS Spatial page has bounded, fit-to-width text 3
 PASS Spatial analytics page navigation 4
+PASS PULSE wordmark is visible on the spatial results board and passes through pointer input
 PASS Spatial analytics page reports the recorded case and metrics for 3
 PASS Spatial page has bounded, fit-to-width text 4
 PASS Spatial analytics page navigation 5
-PASS Spatial analytics page reports the recorded case and metrics for 4
+PASS PULSE wordmark is visible on the spatial results board and passes through pointer input
+PASS Spatial analytics page reports the recorded case and metrics for 1
 PASS Spatial page has bounded, fit-to-width text 5
 PASS Right-hand trigger returns from the last case to the spatial summary
 PASS Analytics export round-trips all five cases and action histories
 PASS All five original lobby windows connected at runtime
 PASS World entrance cannot dismiss the certification dashboard
 PASS Original exhibit loaded 0
+PASS Headset selection rejects an out-of-reach portal 0
+PASS Walking from the hub spawn activates the intended entrance: Anaphylaxis
 PASS Original exhibit opens matching case 0
 PASS Return entrance present 0
 PASS Paused room ignores world entrance 0
 PASS Return entrance opens hub 0
 PASS Original exhibit loaded 1
+PASS Headset selection rejects an out-of-reach portal 1
+PASS Walking from the hub spawn activates the intended entrance: Obstructed Airways
 PASS Original exhibit opens matching case 1
 PASS Return entrance present 1
 PASS Paused room ignores world entrance 1
 PASS Return entrance opens hub 1
 PASS Original exhibit loaded 2
+PASS Headset selection rejects an out-of-reach portal 2
+PASS Walking from the hub spawn activates the intended entrance: Traumatic Hemorrhaging
 PASS Original exhibit opens matching case 2
 PASS Return entrance present 2
 PASS Paused room ignores world entrance 2
 PASS Return entrance opens hub 2
 PASS Original exhibit loaded 3
+PASS Headset selection rejects an out-of-reach portal 3
+PASS Walking from the hub spawn activates the intended entrance: Lost Limb
 PASS Original exhibit opens matching case 3
 PASS Return entrance present 3
 PASS Paused room ignores world entrance 3
 PASS Return entrance opens hub 3
 PASS Original exhibit loaded 4
+PASS Headset selection rejects an out-of-reach portal 4
+PASS Walking from the hub spawn activates the intended entrance: Frostbite
 PASS Original exhibit opens matching case 4
 PASS Return entrance present 4
 PASS Paused room ignores world entrance 4

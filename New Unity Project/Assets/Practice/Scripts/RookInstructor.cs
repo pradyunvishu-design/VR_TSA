@@ -13,23 +13,21 @@ namespace First180.Practice
 
         PracticeRoom room;
         PracticeSession session;
-        PracticeAudio audioSystem;
         Canvas canvas;
         CanvasScaler scaler;
         CanvasGroup group;
         RectTransform card;
         Text caption;
         RawImage portrait;
-        bool animatedPortrait, wasSpeaking;
+        bool animatedPortrait;
         int displayedFrame = -1;
-        float duration, elapsed, acknowledgmentStart;
+        float duration, elapsed;
         bool spatial, reposition;
 
         void Awake()
         {
             room = GetComponent<PracticeRoom>();
             session = PracticeSession.Get();
-            audioSystem = GetComponent<PracticeAudio>();
             var root = new GameObject("ROOK instructor display", typeof(RectTransform), typeof(Canvas),
                 typeof(CanvasScaler), typeof(CanvasGroup));
             root.transform.SetParent(transform, false);
@@ -87,8 +85,6 @@ namespace First180.Practice
             if (session.certification || string.IsNullOrWhiteSpace(message)) return;
             caption.text = message.StartsWith("ROOK: ") ? message.Substring(6) : message;
             elapsed = 0;
-            acknowledgmentStart = 0;
-            wasSpeaking = false;
             duration = Mathf.Clamp(3f + caption.text.Length / 13f, 6, 30);
             reposition = true;
         }
@@ -136,30 +132,9 @@ namespace First180.Practice
         {
             if (!animatedPortrait) return;
 
-            // The atlas rows are idle, speaking, and acknowledgment from top to bottom.
-            int row = 0;
-            float clock = elapsed;
-            bool speaking = audioSystem.TryGetRookSpeechTime(out float speechTime);
-            if (speaking)
-            {
-                row = 1;
-                clock = speechTime;
-                // Keep the card visible while a long voice clip is still playing.
-                duration = Mathf.Max(duration, elapsed + FramesPerGesture / FramesPerSecond + .25f);
-            }
-            else
-            {
-                if (wasSpeaking) acknowledgmentStart = elapsed;
-                float acknowledgmentTime = elapsed - acknowledgmentStart;
-                if (acknowledgmentTime < FramesPerGesture / FramesPerSecond)
-                {
-                    row = 2;
-                    clock = acknowledgmentTime;
-                }
-            }
-            wasSpeaking = speaking;
-
-            int column = Mathf.FloorToInt(clock * FramesPerSecond) % FramesPerGesture;
+            // Gesture once when a caption appears, then hold the looping idle expression.
+            int row = elapsed < FramesPerGesture / FramesPerSecond ? 2 : 0;
+            int column = Mathf.FloorToInt(elapsed * FramesPerSecond) % FramesPerGesture;
             int frame = row * FramesPerGesture + column;
             if (frame == displayedFrame) return;
 

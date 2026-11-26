@@ -95,3 +95,22 @@ The café now has two window tables, each with a pair of outward-facing chairs, 
 Unity passed 2,265 logic and scene checks and the walking and interaction route checks for all five scenarios. The four window-side chairs were checked against the backs of the actual imported meshes. A physical headset playtest was outside this room revision.
 
 Editor checkpoints: [Switchback Coffee and window seating](InteriorRevision/01-Switchback-Coffee.jpg), [Relay Hall and central aisle](InteriorRevision/02-Relay-Hall.jpg), [updated gallery windows in Play Mode](InteriorRevision/03-Updated-gallery-windows.jpg). The [room asset register](Room-asset-register.md) records the creators, licenses, edits and outstanding competition documentation.
+
+## November 26, 2026 — PULSE branding
+
+The project adopted **PULSE** with the subtitle *First Aid in VR*. The AI-assisted practice wordmark uses original geometric lettering and a heartbeat trace. Its mint glow is baked into a shared texture so the gallery signs, desktop header and world-space VR panel display it consistently without camera bloom. The gallery generator reproduces the wall, entrance and planter signs. Internal scene and save identifiers are preserved.
+
+- [Lobby and desktop header in Play Mode](PulseBranding/01-Lobby-Game-view.png)
+- [Gallery wall sign and subtitle in the Unity Editor](PulseBranding/02-Gallery-sign.png)
+
+## November 26, 2026 — Enclosed PULSE simulation bays
+
+All five scenarios now have a solid floor, four walls and a ceiling, a simulation-control observation window, and a numbered PULSE equipment sign. The roadway and alpine scenes use high ceilings for the vehicle and shelter sets. The workshop has additional overhead fill for patient visibility. Lobby window photographs were refreshed from the five saved scenes.
+
+Training and Certification shuffle the three patient identities independently of case severity and choose one of two verified marks per aisle, giving 48 possible cast arrangements per room. Patient models, clinical targets and observations move together. The training UI identifies the inspected or selected patient, and ROOK delivers written corrections without speech. Heartbeat, breathing, ambience and treatment audio remain in the simulation.
+
+The local Unity Editor supplied [seven screenshots with captions](EnclosedBays/README.md). An isolated copy of the same scene and practice-script files passed all five route checks, 2,523 serialized-scene and logic assertions, and 208 Play Mode checks. QA included all six possible marks per patient in each room, desktop and spatial patient panels, both certification outcomes, and returning to the lobby. The spatial UI was exercised through simulated controller input. Physical headset testing remains outstanding.
+
+## November 26, 2026 — Open-air alpine trail
+
+Removed the frostbite chamber and restored the view of the mountains. The timber refuge and its roof remain available for the shelter handoff. The lobby window now shows the outdoor scene. Unity checked the open sky, all six placement marks per patient, all seven tools, shelter approach and return portal. [Unity Editor screenshot](AlpineTrail/Open-air-frostbite.jpg)

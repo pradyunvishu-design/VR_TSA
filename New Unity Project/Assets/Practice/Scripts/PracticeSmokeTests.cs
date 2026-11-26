@@ -32,6 +32,7 @@ namespace First180.Practice
                     var surface=go ? go.GetComponent<MeshCollider>() : null;
                     Check(surface && surface.bounds.size.y<.5f, "Gallery walking surface matches shallow visible geometry: "+piece);
                 }
+                CheckLobbyEnclosure();
                 foreach(var portal in FindObjectsByType<PracticePortal>(FindObjectsSortMode.None).Where(p=>!p.certification && !p.returnToHub))
                 {
                     var exhibitFace=portal.transform.Find("Glass Face");
@@ -120,7 +121,13 @@ namespace First180.Practice
                 }
                 Check(entry!=null,"Original exhibit loaded "+id);
                 if(!entry)break;
-                entry.Use();yield return LoadFinished();
+                var lobbyRig = FindFirstObjectByType<VRInteractionManager>();
+                var exhibit = entry.transform.Find("Glass Face").GetComponent<Collider>();
+                lobbyRig.ApplyHand(1, lobbyRig.rightHand, exhibit, PracticePortal.SelectionRange + 1,
+                    true, true, false, false, false);
+                Check(!session.loading, "Headset selection rejects an out-of-reach portal " + id);
+                yield return WalkToExhibit(entry);
+                yield return LoadFinished();
                 var current=FindFirstObjectByType<PracticeRoom>();
                 Check(current.scenarioId==id,"Original exhibit opens matching case "+id);
                 var exit=FindObjectsByType<PracticePortal>(FindObjectsSortMode.None).FirstOrDefault(p=>p.returnToHub);
@@ -128,7 +135,11 @@ namespace First180.Practice
                 if(!exit)break;
                 current.TogglePause();exit.Use();
                 Check(!session.loading && current.Paused,"Paused room ignores world entrance "+id);
-                current.TogglePause();exit.Use();yield return LoadFinished();
+                current.TogglePause();
+                var roomRig = FindFirstObjectByType<VRInteractionManager>();
+                roomRig.ApplyHand(0, roomRig.leftHand, exit.GetComponent<Collider>(), 4,
+                    true, true, false, false, false);
+                yield return LoadFinished();
                 Check(SceneManager.GetActiveScene().name==ScenarioCatalog.Hub,"Return entrance opens hub "+id);
             }
             Check(session.StartCertification(),"Mastery permits a second certification attempt");
@@ -156,6 +167,57 @@ namespace First180.Practice
             File.WriteAllText(Path.GetFullPath(Path.Combine(Application.dataPath,"../../Design/PracticeDevelopment/runtime-verification.txt")),"UTC: "+DateTime.UtcNow.ToString("o")+"\n"+string.Join("\n",checks)+"\nHardware VR and manual controller gestures not tested.\n");
             Debug.Log("PRACTICE_RUNTIME_SMOKE="+(failed?"FAIL":"PASS"));Destroy(gameObject);UnityEditor.EditorApplication.isPlaying=false;
         }
+        void CheckLobbyEnclosure()
+        {
+            var centre = new Vector3(0, 0, 4);
+            bool walls = true, floor = true, roof = true;
+            for (int i = 0; i < 64; i++)
+            {
+                var radial = Quaternion.Euler(0, i * 360f / 64, 0) * Vector3.forward;
+                var perimeter = centre + radial * 13.5f;
+                walls &= Physics.Raycast(perimeter + Vector3.up * 6, radial, out var wallHit, 2)
+                    && wallHit.collider.name.StartsWith("Perimeter wall");
+                floor &= Physics.Raycast(perimeter + Vector3.up * .25f, Vector3.down, out var floorHit, .3f)
+                    && floorHit.collider.name == "Gallery Floor";
+                roof &= Physics.Raycast(perimeter + Vector3.up * 7.3f, Vector3.up, out var roofHit, 1)
+                    && roofHit.collider.name == "Sealed roof";
+            }
+            Check(walls && floor && roof, "Gallery perimeter has continuous walls, visible floor and a sealed roof");
+            Check(!GameObject.Find("Floating Stair 01"), "The gallery uses a single level without stairs");
+        }
+
+        IEnumerator WalkToExhibit(PracticePortal entry)
+        {
+            var player = FindFirstObjectByType<PracticePlayer>();
+            var controller = player.GetComponent<CharacterController>();
+            var session = PracticeSession.Get();
+            var centre = new Vector3(0, 0, 4);
+            int id = entry.scenarioId;
+            string label = entry.label;
+            var approach = entry.transform.TransformPoint(new Vector3(0, 0, -.7f));
+            float azimuth = Vector3.SignedAngle(Vector3.forward, approach - centre, Vector3.up);
+            var waypoints = new List<Vector3>();
+            float startAngle = azimuth <= 0 ? -180 : 180;
+            for (int i = 0; i <= 10; i++)
+            {
+                float angle = Mathf.Lerp(startAngle, azimuth, i / 10f);
+                waypoints.Add(centre + Quaternion.Euler(0, angle, 0) * Vector3.forward * 6.5f);
+            }
+            waypoints.Add(approach);
+            foreach (var waypoint in waypoints)
+            {
+                for (int step = 0; step < 60 && !session.loading; step++)
+                {
+                    var remaining = Vector3.ProjectOnPlane(waypoint - player.transform.position, Vector3.up);
+                    if (remaining.magnitude < .08f) break;
+                    controller.Move(Vector3.ClampMagnitude(remaining, .23f) + Vector3.down * .1f);
+                    yield return new WaitForFixedUpdate();
+                }
+                if (session.loading) break;
+            }
+            Check(session.loading && session.pendingId == id, "Walking from the hub spawn activates the intended entrance: " + label);
+        }
+
         IEnumerator DocumentSpatialBoard(PracticeRoom room)
         {
             var panel=room.GetComponent<SpatialPanel>();

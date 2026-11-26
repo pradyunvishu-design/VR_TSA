@@ -67,7 +67,7 @@ namespace First180.Practice
             if(snapReady && Mathf.Abs(turn.x)>.7f){transform.RotateAround(head.transform.position,Vector3.up,Mathf.Sign(turn.x)*30);snapReady=false;}
             Hand(left,leftHand,leftRay,0,ref oldTriggerL,ref oldGripL,false);
             Hand(right,rightHand,rightRay,1,ref oldTriggerR,ref oldGripR,PanelOnly);
-            if(!PanelOnly && teleport && !oldTeleport && Physics.Raycast(leftHand.position,leftHand.forward,out var hit,8,~0,QueryTriggerInteraction.Ignore) && hit.normal.y>.9f && hit.point.y<.5f)
+            if(!PracticeSession.Get().loading && !PanelOnly && teleport && !oldTeleport && Physics.Raycast(leftHand.position,leftHand.forward,out var hit,8,~0,QueryTriggerInteraction.Ignore) && hit.normal.y>.9f && hit.point.y<.5f)
             {
                 var p=hit.point+Vector3.up*.1f;
                 if(!Physics.CheckCapsule(p+Vector3.up*.35f,p+Vector3.up*1.6f,.23f,~0,QueryTriggerInteraction.Ignore))
@@ -81,7 +81,7 @@ namespace First180.Practice
         {
             device.TryGetFeatureValue(CommonUsages.triggerButton,out bool trigger);
             device.TryGetFeatureValue(CommonUsages.gripButton,out bool grip);
-            bool found=Physics.Raycast(hand.position,hand.forward,out var hit,12,~0,QueryTriggerInteraction.Collide);
+            bool found=Physics.Raycast(hand.position,hand.forward,out var hit,PracticePortal.SelectionRange,~0,QueryTriggerInteraction.Collide);
             line.SetPosition(0,hand.position);
             line.SetPosition(1,found?hit.point:hand.position+hand.forward*6);
             ApplyHand(index, hand, found?hit.collider:null, hit.distance, trigger, trigger&&!oldTrigger, grip, grip&&!oldGrip, panelOnly);
@@ -145,7 +145,7 @@ namespace First180.Practice
             }
             if (!triggerDown) return;
             var portal=hit.GetComponentInParent<PracticePortal>();
-            if (portal) portal.Use();
+            if (portal && portal.CanSelect(hitDistance)) portal.Use();
             else if (hit.GetComponentInParent<PracticePatient>() is PracticePatient patient) room.Inspect(patient.patientId);
         }
     }

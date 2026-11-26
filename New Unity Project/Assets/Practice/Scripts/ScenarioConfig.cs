@@ -1,7 +1,7 @@
 using UnityEngine;
 namespace First180.Practice
 {
-    [CreateAssetMenu(menuName="FIRST180/Scenario configuration")]
+    [CreateAssetMenu(menuName="PULSE/Scenario configuration")]
     public class ScenarioConfig : ScriptableObject
     {
         [Range(0,4)] public int scenarioId;

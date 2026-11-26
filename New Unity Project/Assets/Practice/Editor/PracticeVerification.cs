@@ -11,7 +11,7 @@ namespace First180.Practice.Editor
     {
         static int assertions;
         static void Check(bool condition,string message){if(!condition)throw new Exception("FAILED: "+message);assertions++;}
-        [MenuItem("FIRST180 Practice/Verify logic and scene contracts")]
+        [MenuItem("PULSE/Verify logic and scene contracts")]
         public static void Run()
         {
             assertions=0;
